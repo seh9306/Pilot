@@ -113,18 +113,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="accepter.cpp" />
     <ClCompile Include="error_handle.cpp" />
+    <ClCompile Include="file\file_manager.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="receiver.cpp" />
-    <ClCompile Include="server.cpp" />
+    <ClCompile Include="packet_proc\packet_proc.cpp" />
+    <ClCompile Include="packet_proc\show_proc.cpp" />
+    <ClCompile Include="packet_proc\sub_proc.cpp" />
+    <ClCompile Include="packet_proc\unsub_proc.cpp" />
+    <ClCompile Include="server\server.cpp" />
+    <ClCompile Include="server\thread\receiver.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="accepter.h" />
-    <ClInclude Include="main.h" />
+    <ClInclude Include="file\file_manager.h" />
     <ClInclude Include="network_data.h" />
-    <ClInclude Include="receiver.h" />
-    <ClInclude Include="server.h" />
+    <ClInclude Include="packet_proc\packet_proc.h" />
+    <ClInclude Include="packet_proc\show_proc.h" />
+    <ClInclude Include="packet_proc\sub_proc.h" />
+    <ClInclude Include="packet_proc\unsub_proc.h" />
+    <ClInclude Include="server\server.h" />
+    <ClInclude Include="server\thread\receiver.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

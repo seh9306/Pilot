@@ -13,39 +13,87 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="헤더 파일\packet_proc">
+      <UniqueIdentifier>{cf03f397-166e-4238-bcb2-6a0a64a2e8ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\packet_proc">
+      <UniqueIdentifier>{56049a7c-f31f-4d0e-a66f-7ef136ad0ed4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\server">
+      <UniqueIdentifier>{afa7d7e2-83d9-4720-86d3-24cd406433bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\server\thread">
+      <UniqueIdentifier>{d96aaf22-16fc-4ef6-a152-d6b20cc496ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\error">
+      <UniqueIdentifier>{806523e2-63e7-42c3-83f2-4b3ca1199038}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\file">
+      <UniqueIdentifier>{6fa9f22d-bb7f-4ccc-976e-ee9783a430fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\file">
+      <UniqueIdentifier>{b8daaabe-a581-4371-b33f-a0c50f6732e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\server">
+      <UniqueIdentifier>{4366fca7-3203-4c93-baaa-c9bcb7729d50}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\server\thread">
+      <UniqueIdentifier>{990b753e-5af0-41fe-b31a-6ad5a91453cc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="accepter.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="packet_proc\packet_proc.cpp">
+      <Filter>소스 파일\packet_proc</Filter>
+    </ClCompile>
+    <ClCompile Include="packet_proc\sub_proc.cpp">
+      <Filter>소스 파일\packet_proc</Filter>
+    </ClCompile>
+    <ClCompile Include="packet_proc\unsub_proc.cpp">
+      <Filter>소스 파일\packet_proc</Filter>
+    </ClCompile>
+    <ClCompile Include="packet_proc\show_proc.cpp">
+      <Filter>소스 파일\packet_proc</Filter>
     </ClCompile>
     <ClCompile Include="error_handle.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\error</Filter>
     </ClCompile>
-    <ClCompile Include="receiver.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="file\file_manager.cpp">
+      <Filter>소스 파일\file</Filter>
     </ClCompile>
-    <ClCompile Include="server.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="server\thread\receiver.cpp">
+      <Filter>헤더 파일\server\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="server\server.cpp">
+      <Filter>소스 파일\server</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="accepter.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="main.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="network_data.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="receiver.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="packet_proc\packet_proc.h">
+      <Filter>헤더 파일\packet_proc</Filter>
     </ClInclude>
-    <ClInclude Include="server.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="packet_proc\sub_proc.h">
+      <Filter>헤더 파일\packet_proc</Filter>
+    </ClInclude>
+    <ClInclude Include="packet_proc\unsub_proc.h">
+      <Filter>헤더 파일\packet_proc</Filter>
+    </ClInclude>
+    <ClInclude Include="packet_proc\show_proc.h">
+      <Filter>헤더 파일\packet_proc</Filter>
+    </ClInclude>
+    <ClInclude Include="file\file_manager.h">
+      <Filter>헤더 파일\file</Filter>
+    </ClInclude>
+    <ClInclude Include="server\server.h">
+      <Filter>헤더 파일\server</Filter>
+    </ClInclude>
+    <ClInclude Include="server\thread\receiver.h">
+      <Filter>소스 파일\server\thread</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

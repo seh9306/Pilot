@@ -2,12 +2,17 @@
 #define RECEIVER_H
 
 #include <WinSock2.h>
-#include "network_data.h"
+#include <vector>
+
+#include "..\..\network_data.h"
+#include "..\..\packet_proc\packet_proc.h"
+
+using std::vector;
 
 class Receiver {
 public:
 	//void run(LPVOID pComPort);
-	void operator()(HANDLE pComPort);
+	void operator()(HANDLE pComPort, vector<PacketProc *> *packetProcs);
 	int id;
 private:
 	HANDLE hCompletionPort;

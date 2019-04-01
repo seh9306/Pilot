@@ -2,9 +2,9 @@
 
 #include <iostream>
 
-void Receiver::operator()(HANDLE pComPort) {
+void Receiver::operator()(HANDLE pComPort, vector<PacketProc *> *packetProcs) {
 	hCompletionPort = pComPort;
-	std::cout << "id : " << id << std::endl;
+	
 	while (TRUE) {
 		GetQueuedCompletionStatus(hCompletionPort,
 			&BytesTransferred,
@@ -20,10 +20,20 @@ void Receiver::operator()(HANDLE pComPort) {
 			continue;
 		}
 
-		PerIoData->wsaBuf.len = BytesTransferred;
-		printf("%s %d\n", PerIoData->wsaBuf.buf, BytesTransferred);
-		WSASend(PerHandleData->hClntSock, &(PerIoData->wsaBuf), 1,
-			NULL, 0, NULL, NULL);
+		// 압축 해제 처리
+
+		// 패킷 분배
+		if (packetProcs->size() > PerIoData->wsaBuf.buf[0]) {
+			PacketProc *pp = packetProcs->at(PerIoData->wsaBuf.buf[0]);
+			pp->packetProc(PerIoData->wsaBuf.buf + 1); // 패킷 처리
+		}
+		else {
+			std::cout << "NULL~" << std::endl;
+		}			
+
+		/*PerIoData->wsaBuf.len = BytesTransferred;
+		printf("%s %d\n", PerIoData->wsaBuf.buf, BytesTransferred);*/
+		
 		memset(&(PerIoData->overlapped), 0, sizeof(OVERLAPPED));
 		PerIoData->wsaBuf.len = BUFSIZE;
 		PerIoData->wsaBuf.buf = PerIoData->buffer;
