@@ -3,6 +3,8 @@
 
 #define BUFSIZE 1024
 
+#include <WinSock2.h>
+
 typedef struct {
 	SOCKET hClntSock; // Handle Client Socket
 	SOCKADDR_IN clntAddr; // Client Address

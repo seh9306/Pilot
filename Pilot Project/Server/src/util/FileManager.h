@@ -1,6 +1,9 @@
 #ifndef FILEMANAGER_H
 #define FILEMANAGER_H
 
+#include <Windows.h>
+#include <list>
+
 class FileManager
 {
 private:
@@ -9,7 +12,7 @@ private:
 public:
 	~FileManager();
 	static FileManager *getInstance();
-	char * getFileList(char *dir);
+	std::list<WIN32_FIND_DATA> *getFileList(char *dir);
 };
 
 #endif

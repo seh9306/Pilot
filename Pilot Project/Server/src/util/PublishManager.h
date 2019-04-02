@@ -4,19 +4,19 @@
 #include <WinSock2.h>
 #include <list>
 
-#include "file_manager.h"
+#include "FileManager.h"
 
 using std::list;
 
-class PubManager
+class PublishManager
 {
 private:
-	static PubManager *pm;
+	static PublishManager *pm;
 	FileManager *fm;
-	PubManager();
+	PublishManager();
 public:
-	virtual ~PubManager();
-	static PubManager *getInstance();
+	virtual ~PublishManager();
+	static PublishManager *getInstance();
 	void publish(char *dir, SOCKET sock);
 	void publish(char *dir, list<SOCKET> socks);
 };

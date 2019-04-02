@@ -1,5 +1,5 @@
-#ifndef PACKETPROC_H
-#define PACKETPROC_H
+#ifndef PACKETPROCESSOR_H
+#define PACKETPROCESSOR_H
 
 #define NUM_OF_PACKET_PROCESSOR 5
 
@@ -13,13 +13,13 @@
 
 #include <WinSock2.h>
 
-class PacketProc
+class PacketProcessor
 {
 public:
-	PacketProc();
-	virtual ~PacketProc();
+	PacketProcessor() {};
+	virtual ~PacketProcessor() {};
 	
-	virtual void packetProc(SOCKET sock, char *msg) = 0;
+	virtual void PacketProcess(SOCKET sock, char *msg) = 0;
 };
 
 #endif
