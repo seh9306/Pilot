@@ -3,9 +3,13 @@
 
 class FileManager
 {
-public:
+private:
+	static FileManager *fm;
 	FileManager();
+public:
 	~FileManager();
+	static FileManager *getInstance();
+	char * getFileList(char *dir);
 };
 
 #endif

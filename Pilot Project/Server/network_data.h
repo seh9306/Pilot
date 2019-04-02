@@ -1,7 +1,7 @@
 #ifndef NETWORK_DATA_H
 #define NETWORK_DATA_H
 
-#define BUFSIZE 100
+#define BUFSIZE 1024
 
 typedef struct {
 	SOCKET hClntSock; // Handle Client Socket
@@ -10,7 +10,7 @@ typedef struct {
 
 typedef struct {
 	OVERLAPPED overlapped; // handle Event 이벤트 처리 할 수 있는 구조체?
-	char buffer[BUFSIZE + 100];
+	char buffer[BUFSIZE];
 	WSABUF wsaBuf; // buffer length, buffer
 } PER_IO_DATA, *LPPER_IO_DATA;
 

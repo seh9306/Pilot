@@ -8,8 +8,8 @@ class ShowProc :
 {
 public:
 	ShowProc();
-	~ShowProc();
-	virtual void packetProc(char *msg);
+	virtual ~ShowProc();
+	virtual void packetProc(SOCKET sock, char *msg);
 };
 
 #endif

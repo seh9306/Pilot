@@ -1,4 +1,4 @@
-#include "show_Proc.h"
+#include "show_proc.h"
 
 #include <iostream>
 
@@ -11,8 +11,9 @@ ShowProc::~ShowProc()
 {
 }
 
-void ShowProc::packetProc(char *msg)
+void ShowProc::packetProc(SOCKET sock, char *msg)
 {
 	std::cout << "Show Processor" << std::endl;
+	
 }
 

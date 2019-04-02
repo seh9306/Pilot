@@ -12,7 +12,7 @@ UnsubProc::~UnsubProc()
 }
 
 
-void UnsubProc::packetProc(char *msg)
+void UnsubProc::packetProc(SOCKET sock, char *msg)
 {
 	std::cout << "Unsub Processor" << std::endl;
 }

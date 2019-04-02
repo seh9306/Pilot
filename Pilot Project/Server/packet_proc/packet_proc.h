@@ -11,13 +11,15 @@
 #define F_DELETE		5
 #define F_MOVE			6
 
+#include <WinSock2.h>
+
 class PacketProc
 {
 public:
 	PacketProc();
-	~PacketProc();
+	virtual ~PacketProc();
 	
-	virtual void packetProc(char *msg) = 0;
+	virtual void packetProc(SOCKET sock, char *msg) = 0;
 };
 
 #endif

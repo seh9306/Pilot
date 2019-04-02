@@ -28,17 +28,20 @@
     <Filter Include="소스 파일\error">
       <UniqueIdentifier>{806523e2-63e7-42c3-83f2-4b3ca1199038}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\file">
-      <UniqueIdentifier>{6fa9f22d-bb7f-4ccc-976e-ee9783a430fb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\file">
-      <UniqueIdentifier>{b8daaabe-a581-4371-b33f-a0c50f6732e7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="헤더 파일\server">
       <UniqueIdentifier>{4366fca7-3203-4c93-baaa-c9bcb7729d50}</UniqueIdentifier>
     </Filter>
     <Filter Include="헤더 파일\server\thread">
       <UniqueIdentifier>{990b753e-5af0-41fe-b31a-6ad5a91453cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\util">
+      <UniqueIdentifier>{6fa9f22d-bb7f-4ccc-976e-ee9783a430fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\util">
+      <UniqueIdentifier>{b8daaabe-a581-4371-b33f-a0c50f6732e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\model">
+      <UniqueIdentifier>{c0e79dad-329a-478e-a3d5-582fe1211a53}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -60,14 +63,20 @@
     <ClCompile Include="error_handle.cpp">
       <Filter>소스 파일\error</Filter>
     </ClCompile>
-    <ClCompile Include="file\file_manager.cpp">
-      <Filter>소스 파일\file</Filter>
-    </ClCompile>
-    <ClCompile Include="server\thread\receiver.cpp">
-      <Filter>헤더 파일\server\thread</Filter>
-    </ClCompile>
     <ClCompile Include="server\server.cpp">
       <Filter>소스 파일\server</Filter>
+    </ClCompile>
+    <ClCompile Include="server\thread\receiver.cpp">
+      <Filter>소스 파일\server\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="util\file_manager.cpp">
+      <Filter>소스 파일\util</Filter>
+    </ClCompile>
+    <ClCompile Include="util\sub_manager.cpp">
+      <Filter>소스 파일\util</Filter>
+    </ClCompile>
+    <ClCompile Include="util\pub_manager.cpp">
+      <Filter>소스 파일\util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -86,14 +95,20 @@
     <ClInclude Include="packet_proc\show_proc.h">
       <Filter>헤더 파일\packet_proc</Filter>
     </ClInclude>
-    <ClInclude Include="file\file_manager.h">
-      <Filter>헤더 파일\file</Filter>
-    </ClInclude>
     <ClInclude Include="server\server.h">
       <Filter>헤더 파일\server</Filter>
     </ClInclude>
     <ClInclude Include="server\thread\receiver.h">
-      <Filter>소스 파일\server\thread</Filter>
+      <Filter>헤더 파일\server\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="util\sub_manager.h">
+      <Filter>헤더 파일\util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\file_manager.h">
+      <Filter>헤더 파일\util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\pub_manager.h">
+      <Filter>헤더 파일\util</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

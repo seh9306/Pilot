@@ -8,8 +8,8 @@ class UnsubProc :
 {
 public:
 	UnsubProc();
-	~UnsubProc();
-	virtual void packetProc(char *msg);
+	virtual ~UnsubProc();
+	virtual void packetProc(SOCKET sock, char *msg);
 };
 
 #endif

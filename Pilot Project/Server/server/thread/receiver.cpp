@@ -4,7 +4,7 @@
 
 void Receiver::operator()(HANDLE pComPort, vector<PacketProc *> *packetProcs) {
 	hCompletionPort = pComPort;
-	
+	std::cout << id << std::endl;
 	while (TRUE) {
 		GetQueuedCompletionStatus(hCompletionPort,
 			&BytesTransferred,
@@ -20,20 +20,22 @@ void Receiver::operator()(HANDLE pComPort, vector<PacketProc *> *packetProcs) {
 			continue;
 		}
 
-		// 압축 해제 처리
+		// decompress packet
+		// ...
 
-		// 패킷 분배
+		// distribute packet
 		if (packetProcs->size() > PerIoData->wsaBuf.buf[0]) {
 			PacketProc *pp = packetProcs->at(PerIoData->wsaBuf.buf[0]);
-			pp->packetProc(PerIoData->wsaBuf.buf + 1); // 패킷 처리
+			// packet processing 
+			// according to each protocol number ( vector index )
+			pp->packetProc(
+				PerHandleData->hClntSock,
+				PerIoData->wsaBuf.buf); 
 		}
 		else {
 			std::cout << "NULL~" << std::endl;
 		}			
-
-		/*PerIoData->wsaBuf.len = BytesTransferred;
-		printf("%s %d\n", PerIoData->wsaBuf.buf, BytesTransferred);*/
-		
+		std::cout << "nonono" << std::endl;
 		memset(&(PerIoData->overlapped), 0, sizeof(OVERLAPPED));
 		PerIoData->wsaBuf.len = BUFSIZE;
 		PerIoData->wsaBuf.buf = PerIoData->buffer;
@@ -52,10 +54,3 @@ void Receiver::operator()(HANDLE pComPort, vector<PacketProc *> *packetProcs) {
 	}
 
 }
-/*
-void Receiver::operator()() {
-	for (int i = 0; i < 5; i++) {
-		Sleep(1000);
-		std::cout << "ThreadPara Num : " << id << std::endl;
-	}
-}*/

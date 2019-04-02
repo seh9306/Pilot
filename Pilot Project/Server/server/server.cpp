@@ -12,8 +12,8 @@
 extern void error_handle(char *);
 
 Server* Server::init() {
-	
-	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) { // Window Socket API initialize
+	// Window Socket API initialize
+	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
 		error_handle("WSAStartup() error !");
 	}
 
@@ -59,25 +59,29 @@ Server* Server::init() {
 }
 
 void Server::start() {
+	int cnt = 0;
 	while (TRUE) {
 		SOCKET hClntSock;
 		SOCKADDR_IN clntAddr;
 		int addrLen = sizeof(clntAddr);
-		printf("waiting for client...\n");
+		printf("waiting for client... %d\n", cnt);
 		hClntSock = accept(hServSock, (SOCKADDR*)&clntAddr, &addrLen);
+		cnt++;
+
 		PerHandleData = (LPPER_HANDLE_DATA)malloc(sizeof(PER_HANDLE_DATA));
 		PerHandleData->hClntSock = hClntSock;
 		memcpy(&(PerHandleData->clntAddr), &clntAddr, addrLen);
 
-		// 1번째 클라이언트 소켓 핸들
-		// 2번째 인자에 완료 포트 핸들이 있으면 생성이 아니고 추가한다.
-		// 3번째 주소와 포트 
-		// 4번째 0을 입력하면 cpu 개수에 따라 자동 설정(?)
+		// params
+		// 1. client socket handle
+		// 2. 인자에 완료 포트 핸들이 있으면 생성이 아니고 추가한다.
+		// 3. 주소와 포트 
+		// 4. 0을 입력하면 cpu 개수에 따라 자동 설정(?)
 		CreateIoCompletionPort((HANDLE)hClntSock, hCompletionPort, (DWORD)PerHandleData, 0);
 
 		PerIoData = (LPPER_IO_DATA)malloc(sizeof(PER_IO_DATA));
 		memset(&(PerIoData->overlapped), 0, sizeof(OVERLAPPED));
-		PerIoData->wsaBuf.len = BUFSIZE + 100;
+		PerIoData->wsaBuf.len = BUFSIZE;
 		PerIoData->wsaBuf.buf = PerIoData->buffer;
 		Flags = 0; // (?)
 
