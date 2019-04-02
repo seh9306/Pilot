@@ -16,8 +16,8 @@ SubscribeProcessor::~SubscribeProcessor()
 // subcribe
 void SubscribeProcessor::PacketProcess(SOCKET sock, char *msg)
 {
-	SubscribeManager* subscribeManager = SubscribeManager::getInstance();
-	PublishManager* publishManager = PublishManager::getInstance();
+	SubscribeManager& subscribeManager = SubscribeManager::GetInstance();
+	PublishManager& publishManager = PublishManager::GetInstance();
 
 	int length = 0;
 
@@ -29,9 +29,9 @@ void SubscribeProcessor::PacketProcess(SOCKET sock, char *msg)
 	}
 
 	// subscribe directory
-	subscribeManager->subscribe(msg + SUB_HEADER_SIZE, sock);
+	subscribeManager.Subscribe(msg + SUB_HEADER_SIZE, sock);
 
 	// publish to sub
-	publishManager->publish(msg + SUB_HEADER_SIZE, sock);
+	publishManager.Publish(msg + SUB_HEADER_SIZE, sock);
 
 }

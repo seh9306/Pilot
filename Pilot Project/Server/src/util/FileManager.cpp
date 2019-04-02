@@ -7,8 +7,6 @@
 
 #include "FileManager.h"
 
-FileManager *FileManager::fm = NULL;
-
 FileManager::FileManager()
 {
 }
@@ -17,18 +15,18 @@ FileManager::~FileManager()
 {
 }
 
-FileManager *FileManager::getInstance() {
-	if (!FileManager::fm) {
-		FileManager::fm = new FileManager();
-	}
-
-	return FileManager::fm;
+FileManager& FileManager::GetInstance() 
+{
+	static FileManager fileManager;
+	return fileManager;
 }
 
-std::list<WIN32_FIND_DATA> *FileManager::getFileList(char *dir) {
+std::list<WIN32_FIND_DATA>* FileManager::GetFileList(char *dir) 
+{
 	LARGE_INTEGER filesize;
 	WIN32_FIND_DATA FindFileData;
 	HANDLE hFind;
+	// use new operator
 	std::list<WIN32_FIND_DATA> *files = new std::list<WIN32_FIND_DATA>();
 	
 	hFind = FindFirstFile(_T(strcat(dir, "*.*")), &FindFileData);
@@ -36,7 +34,7 @@ std::list<WIN32_FIND_DATA> *FileManager::getFileList(char *dir) {
 	if (hFind == INVALID_HANDLE_VALUE)
 	{
 		printf("FindFirstFile failed (%d)\n", GetLastError());
-		return NULL;
+		return nullptr;
 	}
 
 	do

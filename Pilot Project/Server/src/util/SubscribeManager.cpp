@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-SubscribeManager *SubscribeManager::sm = NULL;
-
 SubscribeManager::SubscribeManager()
 {
 }
@@ -12,41 +10,49 @@ SubscribeManager::~SubscribeManager()
 {
 }
 
-SubscribeManager *SubscribeManager::getInstance() {
-	if (!SubscribeManager::sm) {
-		SubscribeManager::sm = new SubscribeManager();
-	}
-	return SubscribeManager::sm;
+SubscribeManager& SubscribeManager::GetInstance() 
+{
+	static SubscribeManager subscribeManager;
+	return subscribeManager;
 }
 
-void SubscribeManager::subscribe(char *dir, SOCKET sock) {
-	std::string DIR(dir);
+bool SubscribeManager::Subscribe(char *dir, SOCKET sock) 
+{
+	std::string dirString(dir);
 	
-	auto search = sockets.find(DIR);
+	auto search = sockets.find(dirString);
 
-	if (search != sockets.end()) {
+	if (search != sockets.end()) 
+	{
 		search->second->push_back(sock);
 	}
-	else {
+	else 
+	{
 		std::cout << "NULL" << std::endl;
 		std::list<SOCKET> *temp = new std::list<SOCKET>();
 		temp->push_back(sock);
-		sockets.insert({ DIR, temp });
+		sockets.insert({ dirString, temp });
 	}
+
+	return true;
 }
 
-void SubscribeManager::unSubscribe(char *dir) {
-	std::string DIR(dir);
+bool SubscribeManager::UnSubscribe(char *dir) 
+{
+	std::string dirString(dir);
+	return false;
 }
 
-std::list<SOCKET> *SubscribeManager::getSocketsByDir(char *dir) {
-	std::string DIR(dir);
+std::list<SOCKET> *SubscribeManager::GetSocketsByDir(char *dir) 
+{
+	std::string dirString(dir);
 
-	auto search = sockets.find(DIR);
+	auto search = sockets.find(dirString);
 
-	if (search != sockets.end()) {
+	if (search != sockets.end()) 
+	{
 		return search->second;
 	}
 
-	return NULL;
+	return nullptr;
 }

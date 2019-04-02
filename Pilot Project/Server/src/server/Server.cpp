@@ -23,7 +23,7 @@ Server::Server()
 		error_handle("WSAStartup() error !");
 	}
 
-	hServSock = WSASocketW(PF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
+	hServSock = WSASocketW(PF_INET, SOCK_STREAM, 0, nullptr, 0, WSA_FLAG_OVERLAPPED);
 
 	servAddr.sin_family = AF_INET;
 	servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -38,15 +38,11 @@ bool Server::Init()
 
 	if (bind(hServSock, (SOCKADDR*)&servAddr, sizeof(SOCKADDR)) == -1) 
 	{
-		int code = GetLastError();
-		error_handle("bind() error !");
 		return kBindError;
 	}
 
 	if (listen(hServSock, 5) == -1) 
 	{
-		int code = GetLastError();
-		error_handle("listen() error !");
 		return kListenError;
 	}
 	
@@ -55,7 +51,7 @@ bool Server::Init()
 	packetProcessors.push_back(new ShowProcessor());
 
 	// Create IO CompletionPort
-	hCompletionPort = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0);
+	hCompletionPort = CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, 0);
 	
 	for (int i = 0; i < systemInfo.dwNumberOfProcessors; i++) {
 		Receiver receiver;
@@ -102,7 +98,7 @@ bool Server::Start()
 			&recvBytes,
 			&flags,
 			&(perIoData->overlapped),
-			NULL
+			nullptr
 		);
 	}
 }

@@ -1,8 +1,7 @@
 #include "PublishManager.h"
+#include "FileManager.h"
 
 #include <iostream>
-
-PublishManager *PublishManager::pm = NULL;
 
 PublishManager::PublishManager()
 {
@@ -12,15 +11,17 @@ PublishManager::~PublishManager()
 {
 }
 
-PublishManager * PublishManager::getInstance()
+PublishManager& PublishManager::GetInstance()
 {
-	return nullptr;
+	static PublishManager publishManager;
+	return publishManager;
 }
 
-void PublishManager::publish(char * dir, SOCKET sock)
+bool PublishManager::Publish(char * dir, SOCKET sock)
 {
-	FileManager *fm = FileManager::getInstance();
-	list<WIN32_FIND_DATA> *files = fm->getFileList(dir);
+	FileManager fileManager = FileManager::GetInstance();
+	std::list<WIN32_FIND_DATA> *files = fileManager.GetFileList(dir);
+
 	std::cout << "size :: " << sizeof(WIN32_FIND_DATA) << std::endl;
 	/*WSABUF temp;
 	temp.buf = "aaaa";
@@ -33,8 +34,10 @@ void PublishManager::publish(char * dir, SOCKET sock)
 			std::cout << "WSASend() error" << std::endl;
 	}
 	*/
+	return true;
 }
 
-void PublishManager::publish(char * dir, list<SOCKET> socks)
+bool PublishManager::Publish(char * dir, std::list<SOCKET> socks)
 {
+	return false;
 }

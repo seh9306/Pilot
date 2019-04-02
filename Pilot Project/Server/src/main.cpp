@@ -1,10 +1,39 @@
 
 #include "server/Server.h"
 
-int main(int argc, char *args) {
+extern void error_handle(char *);
+
+int main(int argc, char *args) 
+{
+	// create Server
 	Server server;
-	server.Init();
-	server.Start();
+	int code = 0;
+
+	// initialize server
+	if ((code = server.Init()) != 0) 
+	{
+
+		switch (code) 
+		{
+
+		case kBindError:
+			error_handle("bind() error !");
+			exit(1);
+			break;
+		case kListenError:
+			error_handle("listen() error !");
+			exit(1);
+			break;
+
+		}
+	}
+
+	// start server
+	if ((code = server.Start()) != 0)
+	{
+		error_handle("Start() error !");
+		exit(1);
+	}
 
 	return 0;
 }

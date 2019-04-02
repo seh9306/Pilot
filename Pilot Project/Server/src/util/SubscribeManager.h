@@ -14,10 +14,10 @@ private:
 	SubscribeManager();
 public:
 	~SubscribeManager();
-	static SubscribeManager *getInstance();
-	void subscribe(char *dir, SOCKET sock);
-	void unSubscribe(char *dir);
-	std::list<SOCKET> *getSocketsByDir(char *dir);
+	static SubscribeManager& GetInstance();
+	bool Subscribe(char *dir, SOCKET sock);
+	bool UnSubscribe(char *dir);
+	std::list<SOCKET> *GetSocketsByDir(char *dir);
 };
 
 #endif
