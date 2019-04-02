@@ -1,6 +1,6 @@
 #include "SubscribeProcessor.h"
-#include "SubscribeManager.h"
-#include "PublishManager.h"
+#include "../util/SubscribeManager.h"
+#include "../util/PublishManager.h"
 
 #include <iostream>
 

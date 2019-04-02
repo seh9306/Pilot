@@ -1,7 +1,7 @@
 #ifndef PUBPROCESSOR_H
 #define PUBPROCESSOR_H
 
-#include "FileManager.h"
+#include "../util/FileManager.h"
 
 class PublishProcessor
 {

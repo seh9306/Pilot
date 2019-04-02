@@ -8,9 +8,9 @@
 
 #include "NetworkData.h"
 
-enum InitErrorType {
-	iBindError = 0,
-	iListenError = 1
+enum InitErrors {
+	kBindError = 0,
+	kListenError = 1
 };
 
 class PacketProcessor;

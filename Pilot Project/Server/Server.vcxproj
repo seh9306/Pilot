@@ -68,16 +68,19 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>C:\Program Files %28x86%29\Windows Kits\10\Include\10.0.10150.0\ucrt;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\Park\Source\Repos\seh9306\Pilot Project\Server\src;C:\Users\Park\Source\Repos\seh9306\Pilot Project\Server\src\packet_proc;C:\Users\Park\Source\Repos\seh9306\Pilot Project\Server\src\server;C:\Users\Park\Source\Repos\seh9306\Pilot Project\Server\src\sub;C:\Users\Park\Source\Repos\seh9306\Pilot Project\Server\src\util;C:\Users\Park\Source\Repos\seh9306\Pilot Project\Server\src\server\thread;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Park\Source\Repos\seh9306\Pilot Project\Server\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
+      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\Windows Kits\10\Lib\10.0.10150.0\ucrt\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -114,30 +117,30 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\ErrorHandle.cpp" />
+    <ClCompile Include="src\Error\ErrorHandle.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\packet_proc\PublishProcessor.cpp" />
-    <ClCompile Include="src\packet_proc\ShowProcessor.cpp" />
-    <ClCompile Include="src\packet_proc\SubscribeProcessor.cpp" />
-    <ClCompile Include="src\packet_proc\UnSubscribeProcessor.cpp" />
-    <ClCompile Include="src\server\Server.cpp" />
-    <ClCompile Include="src\server\thread\Receiver.cpp" />
-    <ClCompile Include="src\util\FileManager.cpp" />
-    <ClCompile Include="src\util\PublishManager.cpp" />
-    <ClCompile Include="src\util\SubscribeManager.cpp" />
+    <ClCompile Include="src\PacketProcessor\PublishProcessor.cpp" />
+    <ClCompile Include="src\PacketProcessor\ShowProcessor.cpp" />
+    <ClCompile Include="src\PacketProcessor\SubscribeProcessor.cpp" />
+    <ClCompile Include="src\PacketProcessor\UnSubscribeProcessor.cpp" />
+    <ClCompile Include="src\Server\Server.cpp" />
+    <ClCompile Include="src\Server\Thread\Receiver.cpp" />
+    <ClCompile Include="src\Util\FileManager.cpp" />
+    <ClCompile Include="src\Util\PublishManager.cpp" />
+    <ClCompile Include="src\Util\SubscribeManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\NetworkData.h" />
-    <ClInclude Include="src\packet_proc\PacketProcessor.h" />
-    <ClInclude Include="src\packet_proc\PublishProcessor.h" />
-    <ClInclude Include="src\packet_proc\ShowProcessor.h" />
-    <ClInclude Include="src\packet_proc\SubscribeProcessor.h" />
-    <ClInclude Include="src\packet_proc\UnSubscribeProcessor.h" />
-    <ClInclude Include="src\server\Server.h" />
-    <ClInclude Include="src\server\thread\Receiver.h" />
-    <ClInclude Include="src\util\FileManager.h" />
-    <ClInclude Include="src\util\PublishManager.h" />
-    <ClInclude Include="src\util\SubscribeManager.h" />
+    <ClInclude Include="src\PacketProcessor\PacketProcessor.h" />
+    <ClInclude Include="src\PacketProcessor\PublishProcessor.h" />
+    <ClInclude Include="src\PacketProcessor\ShowProcessor.h" />
+    <ClInclude Include="src\PacketProcessor\SubscribeProcessor.h" />
+    <ClInclude Include="src\PacketProcessor\UnSubscribeProcessor.h" />
+    <ClInclude Include="src\Server\NetworkData.h" />
+    <ClInclude Include="src\Server\Server.h" />
+    <ClInclude Include="src\Server\Thread\Receiver.h" />
+    <ClInclude Include="src\Util\FileManager.h" />
+    <ClInclude Include="src\Util\PublishManager.h" />
+    <ClInclude Include="src\Util\SubscribeManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

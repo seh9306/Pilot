@@ -1,5 +1,5 @@
-#include "NetworkData.h"
-#include "PacketProcessor.h"
+#include "../NetworkData.h"
+#include "../../PacketProcessor/PacketProcessor.h"
 #include "Receiver.h"
 
 #include <iostream>

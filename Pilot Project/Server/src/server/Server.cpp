@@ -3,15 +3,15 @@
 #include <vector>
 
 #include "Server.h"
-#include "Receiver.h"
+#include "thread/Receiver.h"
 
 #include "NetworkData.h"
 
 // packet process
-#include "PacketProcessor.h"
-#include "SubscribeProcessor.h"
-#include "UnSubscribeProcessor.h"
-#include "ShowProcessor.h"
+#include "../PacketProcessor/PacketProcessor.h"
+#include "../PacketProcessor/SubscribeProcessor.h"
+#include "../PacketProcessor/UnSubscribeProcessor.h"
+#include "../PacketProcessor/ShowProcessor.h"
 
 extern void error_handle(char *);
 
@@ -40,14 +40,14 @@ bool Server::Init()
 	{
 		int code = GetLastError();
 		error_handle("bind() error !");
-		return iBindError;
+		return kBindError;
 	}
 
 	if (listen(hServSock, 5) == -1) 
 	{
 		int code = GetLastError();
 		error_handle("listen() error !");
-		return iListenError;
+		return kListenError;
 	}
 	
 	packetProcessors.push_back(new SubscribeProcessor());

@@ -1,5 +1,5 @@
 
-#include "Server.h"
+#include "server/Server.h"
 
 int main(int argc, char *args) {
 	Server server;
