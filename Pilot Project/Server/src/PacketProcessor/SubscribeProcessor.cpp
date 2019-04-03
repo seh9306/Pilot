@@ -23,7 +23,7 @@ void SubscribeProcessor::PacketProcess(SOCKET sock, char *msg)
 
 	memcpy((void*)&length, msg + 1, 4);
 
-	if (!msg || length > 261 + 4 + 1) // MAX_PATH 260..
+	if (!msg || length > SUB_HEADER_SIZE + MAX_PATH + 1 ) // MAX_PATH 260..
 	{
 		return;
 	}
@@ -33,5 +33,5 @@ void SubscribeProcessor::PacketProcess(SOCKET sock, char *msg)
 
 	// publish to sub
 	publishManager.Publish(msg + SUB_HEADER_SIZE, sock);
-
+	std::cout << "¾ßÈ£" << std::endl;
 }

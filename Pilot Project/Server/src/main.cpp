@@ -10,7 +10,7 @@ int main(int argc, char *args)
 	int code = 0;
 
 	// initialize server
-	if ((code = server.Init()) != 0) 
+	if ((code = server.Init()) == -1) 
 	{
 
 		switch (code) 

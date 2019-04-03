@@ -27,7 +27,7 @@ Server::Server()
 
 	servAddr.sin_family = AF_INET;
 	servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	servAddr.sin_port = htons(port);
+	servAddr.sin_port = htons(9030);
 
 	GetSystemInfo(&systemInfo);
 
@@ -53,7 +53,8 @@ bool Server::Init()
 	// Create IO CompletionPort
 	hCompletionPort = CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, 0);
 	
-	for (int i = 0; i < systemInfo.dwNumberOfProcessors; i++) {
+	for (int i = 0; i < systemInfo.dwNumberOfProcessors; i++) 
+	{
 		Receiver receiver;
 		receiver.id = i;
 		std::thread IOCPThread(receiver, hCompletionPort, packetProcessors);
@@ -61,13 +62,14 @@ bool Server::Init()
 
 	}
 
-	return 0;
+	return true;
 }
 
 bool Server::Start() 
 {
 	int cnt = 0;
-	while (TRUE) {
+	while (TRUE) 
+	{
 		SOCKET hClntSock;
 		SOCKADDR_IN clntAddr;
 		int addrLen = sizeof(clntAddr);

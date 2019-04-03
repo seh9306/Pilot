@@ -3,13 +3,19 @@
 
 #define NUM_OF_PACKET_PROCESSOR 5
 
-#define F_SUBSCRIBE		0
-#define F_UNSUBSCRIBE	1
-#define F_SHOW			2
-#define F_CREATE		3
-#define F_RENAME		4
-#define F_DELETE		5
-#define F_MOVE			6
+#define PROTOCOL_TYPE_SIZE 1
+#define WIN_FIND_DATA_FRONT_SIZE 36
+#define NULL_VALUE_SIZE 1
+
+enum protocolType {
+	kSubscribe = 1,
+	kUnSubscribe = 2,
+	kShow,
+	kCreate,
+	kRename,
+	kDelete,
+	kMove
+};
 
 #include <WinSock2.h>
 
