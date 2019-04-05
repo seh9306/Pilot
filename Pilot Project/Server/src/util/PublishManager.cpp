@@ -1,7 +1,7 @@
 #include "PublishManager.h"
 #include "FileManager.h"
 #include "../Server/NetworkData.h"
-#include "PacketProcessor\PacketProcessor.h"
+#include "../PacketProcessor/PacketProcessor.h"
 
 #include <iostream>
 #include <WinSock2.h>
@@ -24,15 +24,19 @@ bool PublishManager::Publish(char * dir, SOCKET sock)
 {
 	FileManager fileManager = FileManager::GetInstance();
 
-	std::list<WIN32_FIND_DATA>* files = fileManager.GetFileList(dir);
+	std::list<WIN32_FIND_DATA>* files = fileManager.GetFileList(dir + SUB_HEADER_SIZE);
+
+	if (files == nullptr) 
+	{
+		// send fail
+		return false;
+	}
 
 	int listSize = files->size();
 	WSABUF wsaBuf;
 	int bufOffset = 0;
 
-	//char *temp = new char[sizeof(WIN32_FIND_DATA)];
-	char buf[1024];
-	wsaBuf.buf = buf;
+	wsaBuf.buf = dir;
 	DWORD length = 0;
 
 	// copy protocol type
@@ -43,17 +47,22 @@ bool PublishManager::Publish(char * dir, SOCKET sock)
 	memcpy(wsaBuf.buf
 		+ bufOffset, &listSize, sizeof(int));
 	bufOffset += sizeof(int);
-	
+
 	for (WIN32_FIND_DATA file : *files)
 	{
+		
 		int fileNameSize = strlen(file.cFileName);
 
 		int size = WIN_FIND_DATA_FRONT_SIZE
 			+ fileNameSize
+			+ sizeof(fileNameSize)
 			+ NULL_VALUE_SIZE;
+		
+		if (size + bufOffset > BUFSIZE - 2 ) 
+		{
+			wsaBuf.len = 1024; //bufOffset;
+			wsaBuf.buf[bufOffset] = '\n';
 
-		if (size + bufOffset > BUFSIZE - 1) {
-			wsaBuf.len = bufOffset;
 			// publish
 			if (WSASend(sock, &wsaBuf, 1,
 				&length, 0, NULL, NULL) == SOCKET_ERROR)
@@ -67,7 +76,7 @@ bool PublishManager::Publish(char * dir, SOCKET sock)
 				bufOffset = 0;
 			}
 		}
-		
+
 		// copy file data front
 		memcpy(wsaBuf.buf
 			+ bufOffset, &file, WIN_FIND_DATA_FRONT_SIZE);
@@ -76,7 +85,6 @@ bool PublishManager::Publish(char * dir, SOCKET sock)
 		// copy file name size
 		memcpy(wsaBuf.buf
 			+ bufOffset, &fileNameSize, sizeof(int));
-		//printf("%d // \n", fileNameSize);
 		bufOffset += sizeof(int);
 
 		// copy file name
@@ -86,16 +94,21 @@ bool PublishManager::Publish(char * dir, SOCKET sock)
 		
 	}
 
-	wsaBuf.len = bufOffset;
-	// publish
-	if (WSASend(sock, &wsaBuf, 1,
-		&length, 0, NULL, NULL) == SOCKET_ERROR)
+	if (bufOffset != NULL)
 	{
-		if (WSAGetLastError() != WSA_IO_PENDING)
-			std::cout << "WSASend() error :: " << GetLastError() << std::endl;
-		return false;
-	}
+		wsaBuf.len = 1024; //bufOffset;
+		wsaBuf.buf[bufOffset] = '\n';
 
+		// publish
+		if (WSASend(sock, &wsaBuf, 1,
+			&length, 0, NULL, NULL) == SOCKET_ERROR)
+		{
+			if (WSAGetLastError() != WSA_IO_PENDING)
+				std::cout << "WSASend() error :: " << GetLastError() << std::endl;
+			return false;
+		}
+	}
+	
 	return true;
 }
 

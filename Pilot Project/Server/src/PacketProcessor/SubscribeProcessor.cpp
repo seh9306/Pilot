@@ -32,6 +32,6 @@ void SubscribeProcessor::PacketProcess(SOCKET sock, char *msg)
 	subscribeManager.Subscribe(msg + SUB_HEADER_SIZE, sock);
 
 	// publish to sub
-	publishManager.Publish(msg + SUB_HEADER_SIZE, sock);
-	std::cout << "¾ßÈ£" << std::endl;
+	publishManager.Publish(msg, sock);
+
 }
