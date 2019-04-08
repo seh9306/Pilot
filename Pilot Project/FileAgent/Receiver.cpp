@@ -1,13 +1,13 @@
-#include "../NetworkData.h"
-#include "../../PacketProcessor/PacketProcessor.h"
+#include "stdafx.h"
+
 #include "Receiver.h"
+#include "PacketProcessor.h"
 
 #include <iostream>
 
 void Receiver::operator()(HANDLE pComPort, std::vector<PacketProcessor *> &packetProcessors)
 {
 	hCompletionPort = pComPort;
-	std::cout << id << std::endl;
 	while (true) 
 	{
 		GetQueuedCompletionStatus(hCompletionPort,
@@ -25,7 +25,7 @@ void Receiver::operator()(HANDLE pComPort, std::vector<PacketProcessor *> &packe
 			free(perIoData);
 			continue;
 		}
-
+		TRACE(TEXT("수신수신수신"));
 		// decompress packet
 		// ...
 
@@ -38,8 +38,9 @@ void Receiver::operator()(HANDLE pComPort, std::vector<PacketProcessor *> &packe
 				perIoData->wsaBuf.buf); 
 		}
 		else {
+			TRACE(TEXT("NULL\n"));
 			std::cout << "NULL~" << std::endl;
-		}			
+		}
 
 		memset(&(perIoData->overlapped), 0, sizeof(OVERLAPPED));
 		perIoData->wsaBuf.len = BUFSIZE;

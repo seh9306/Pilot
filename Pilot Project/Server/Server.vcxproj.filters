@@ -60,9 +60,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\PacketProcessor\UnSubscribeProcessor.h">
-      <Filter>src\PacketProcessor</Filter>
-    </ClInclude>
     <ClInclude Include="src\PacketProcessor\PacketProcessor.h">
       <Filter>src\PacketProcessor</Filter>
     </ClInclude>
@@ -92,6 +89,9 @@
     </ClInclude>
     <ClInclude Include="src\Util\PublishManager.h">
       <Filter>src\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PacketProcessor\UnSubscribeProcessor.h">
+      <Filter>src\PacketProcessor</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -26,6 +26,7 @@ bool PublishManager::Publish(char * dir, SOCKET sock)
 
 	std::list<WIN32_FIND_DATA>* files = fileManager.GetFileList(dir + SUB_HEADER_SIZE);
 
+	std::cout << dir + SUB_HEADER_SIZE << std::endl;
 	if (files == nullptr) 
 	{
 		// send fail
@@ -47,6 +48,8 @@ bool PublishManager::Publish(char * dir, SOCKET sock)
 	memcpy(wsaBuf.buf
 		+ bufOffset, &listSize, sizeof(int));
 	bufOffset += sizeof(int);
+
+	std::cout << "size :: " << listSize << std::endl;
 
 	for (WIN32_FIND_DATA file : *files)
 	{
@@ -73,7 +76,8 @@ bool PublishManager::Publish(char * dir, SOCKET sock)
 			}
 			else 
 			{
-				bufOffset = 0;
+				wsaBuf.buf[0] = kShow;
+				bufOffset = 0 + PROTOCOL_TYPE_SIZE;
 			}
 		}
 
@@ -90,6 +94,7 @@ bool PublishManager::Publish(char * dir, SOCKET sock)
 		// copy file name
 		memcpy(wsaBuf.buf
 			+ bufOffset, file.cFileName, fileNameSize + NULL_VALUE_SIZE);
+		//std::cout << wsaBuf.buf + bufOffset << ":::" << bufOffset << std::endl;
 		bufOffset += fileNameSize + NULL_VALUE_SIZE;
 		
 	}
@@ -108,7 +113,7 @@ bool PublishManager::Publish(char * dir, SOCKET sock)
 			return false;
 		}
 	}
-	
+
 	return true;
 }
 

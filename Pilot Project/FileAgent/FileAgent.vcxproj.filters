@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="헤더 파일">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="src\Client">
+      <UniqueIdentifier>{83266e88-796a-4b5d-af49-b4ef01fd0154}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Client\Thread">
+      <UniqueIdentifier>{dddbe6d9-626b-4c5c-becb-6fa3cba0e502}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\PacketProcessor">
+      <UniqueIdentifier>{bd1b85f6-cbc3-4128-8974-0e28e67fbb91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\View">
+      <UniqueIdentifier>{987fb50e-1e89-4924-aa1c-3d72d5da1dce}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="FileAgent.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="MainFrm.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="FileAgentDoc.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="FileAgentSocket.h">
+      <Filter>src\Client</Filter>
+    </ClInclude>
+    <ClInclude Include="Receiver.h">
+      <Filter>src\Client\Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkData.h">
+      <Filter>src\Client</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketProcessor.h">
+      <Filter>src\PacketProcessor</Filter>
+    </ClInclude>
+    <ClInclude Include="FileAgentView.h">
+      <Filter>src\View</Filter>
+    </ClInclude>
+    <ClInclude Include="ShowProcessor.h">
+      <Filter>src\PacketProcessor</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="FileAgent.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="MainFrm.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="FileAgentDoc.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="FileAgentSocket.cpp">
+      <Filter>src\Client</Filter>
+    </ClCompile>
+    <ClCompile Include="Receiver.cpp">
+      <Filter>src\Client\Thread</Filter>
+    </ClCompile>
+    <ClCompile Include="FileAgentView.cpp">
+      <Filter>src\View</Filter>
+    </ClCompile>
+    <ClCompile Include="ShowProcessor.cpp">
+      <Filter>src\PacketProcessor</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="FileAgent.rc">
+      <Filter>리소스 파일</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\FileAgent.rc2">
+      <Filter>리소스 파일</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\FileAgentDoc.ico">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\FileAgent.ico">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Toolbar.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+  </ItemGroup>
+</Project>
