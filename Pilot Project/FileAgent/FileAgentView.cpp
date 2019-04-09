@@ -150,6 +150,7 @@ int CFileAgentView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	return 0;
 }
 
+// Connect button handler
 afx_msg void CFileAgentView::OnConeectBtnClicked()
 {
 	SetItemCountEx(0);
@@ -186,6 +187,7 @@ afx_msg void CFileAgentView::OnExploreBtnClicked()
 	fileAgentSocket->Show(pCharDir);
 }
 // @issue
+// List item dbclick handler
 #include <iostream>
 void CFileAgentView::OnItemDblclked(NMHDR * pNMHDR, LRESULT * pResult)
 {
@@ -198,10 +200,44 @@ void CFileAgentView::OnItemDblclked(NMHDR * pNMHDR, LRESULT * pResult)
 	int itemid = pItem->iGroup;// iItem;
 
 	CString sIndexValue;
-
+	CString attr;
 	sIndexValue = fileCListCtrl.GetItemText(itemid, 0);
+	attr = fileCListCtrl.GetItemText(itemid, 3);
 
 	std::wcout << (const wchar_t*)sIndexValue << std::endl;
+	std::wcout << (const wchar_t*)dir << std::endl;
+	std::cout <<  "test " << (DWORD)_ttoi((LPCTSTR)attr) <<  std::endl;
+
+	if ((DWORD)_ttoi((LPCTSTR)attr) & FILE_ATTRIBUTE_DIRECTORY && sIndexValue != CString("."))
+	{
+		FileAgentSocket *fileAgentSocket = FileAgentSocket::GetInstance();
+		//fileAgentSocket->UnSubscribe(dir);
+		SetItemCountEx(0);
+		files.clear();
+
+		if (sIndexValue == CString(".."))
+		{
+			int i = dir.GetLength() - 2;
+			for (; i > 0; i--)
+			{
+				if (dir.GetAt(i) == CString("\\"))
+					break;
+			}
+			if (dir.GetAt(i) != CString("\\"))
+			{
+				return;
+			}
+			dir = dir.Left(i+1);
+			std::wcout << (const wchar_t*)dir << std::endl;
+		}
+		else
+		{
+			dir += sIndexValue + CString("\\");
+		}
+		strcpy_s(pCharDir, CT2A(dir));
+		dirCEdit.SetWindowTextW(dir);
+		fileAgentSocket->Subscribe(pCharDir);
+	}
 }
 
 

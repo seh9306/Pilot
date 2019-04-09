@@ -2,8 +2,6 @@
 #include "../util/SubscribeManager.h"
 #include "../util/PublishManager.h"
 
-#include <iostream>
-
 SubscribeProcessor::SubscribeProcessor()
 {
 }

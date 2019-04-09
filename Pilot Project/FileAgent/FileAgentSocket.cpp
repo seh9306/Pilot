@@ -21,12 +21,14 @@ FileAgentSocket::FileAgentSocket()
 	packetProcessors.push_back(new ShowProcessor());
 }
 
+// @issue
 FileAgentSocket::~FileAgentSocket() 
 {
 	TRACE(TEXT("FileAgentSocket ¼Ò¸ê"));
 	
 }
 
+// @issue
 FileAgentSocket* FileAgentSocket::GetInstance() 
 {
 	if (fileAgent == nullptr) 
@@ -102,6 +104,8 @@ SOCKET FileAgentSocket::GetSocket()
 	return fileAgentSocket;
 }
 
+// @issue
+#include <iostream>
 void FileAgentSocket::Subscribe(char * dir)
 {
 	dataBuf.buf = buffer;
@@ -115,6 +119,8 @@ void FileAgentSocket::Subscribe(char * dir)
 
 	memcpy(dataBuf.buf + dataBuf.len, dir, length + NULL_VALUE_SIZE);
 	dataBuf.len += strlen(dir) + NULL_VALUE_SIZE;
+
+	std::cout << "¿©±â´Â socket :: " << dir << std::endl;
 
 	if (WSASend(fileAgentSocket, &dataBuf, 1, (LPDWORD)&sendBytes, 0, NULL, NULL) == SOCKET_ERROR)
 	{
