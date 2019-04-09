@@ -3,6 +3,8 @@
 
 #include "PacketProcessor.h"
 
+#define SUCCESS_SUBSCRIBE_INDEX 1
+
 class SubscribeProcessor :
 	public PacketProcessor
 {

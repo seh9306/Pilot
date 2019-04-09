@@ -24,10 +24,14 @@ public:
 public:
 	virtual BOOL InitInstance();
 	virtual int ExitInstance();
+	char *GetDirectory();
+	void SetDirectory(char* dir, int size = 0);
 
 // 구현입니다.
 	afx_msg void OnAppAbout();
 	DECLARE_MESSAGE_MAP()
+private:
+	char directory[MAX_PATH];
 };
 
 extern CFileAgentApp theApp;

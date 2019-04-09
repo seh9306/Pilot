@@ -2,6 +2,9 @@
 
 #include <iostream>
 
+// @issue
+#define SM_DEBUG
+
 SubscribeManager::SubscribeManager()
 {
 }
@@ -24,11 +27,16 @@ bool SubscribeManager::Subscribe(char *dir, SOCKET sock)
 
 	if (search != sockets.end()) 
 	{
+#ifdef SM_DEBUG
+		std::cout << "subscribe " << dir << std::endl;
+#endif
 		search->second->push_back(sock);
 	}
 	else 
 	{
-		std::cout << "NULL" << std::endl;
+#ifdef SM_DEBUG
+		std::cout << "No Processor" << std::endl;
+#endif
 		std::list<SOCKET> *temp = new std::list<SOCKET>();
 		temp->push_back(sock);
 		sockets.insert({ dirString, temp });

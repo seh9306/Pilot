@@ -2,6 +2,12 @@
 #include "../util/SubscribeManager.h"
 #include "../util/PublishManager.h"
 
+#define SP_DEBUG
+
+#ifdef SP_DEBUG
+#include <iostream>
+#endif
+
 SubscribeProcessor::SubscribeProcessor()
 {
 }
@@ -27,9 +33,19 @@ void SubscribeProcessor::PacketProcess(SOCKET sock, char *msg)
 	}
 
 	// subscribe directory
-	subscribeManager.Subscribe(msg + SUB_HEADER_SIZE, sock);
+	if (subscribeManager.Subscribe(msg + SUB_HEADER_SIZE, sock)) 
+	{
+#ifdef SP_DEBUG
+		std::cout << "Subscribe success :: " << msg + SUB_HEADER_SIZE <<std::endl;
+#endif
+		publishManager.sSubscribe(msg, sock);
+	}
+	else
+	{
+		publishManager.fSubscribe(msg + SUB_HEADER_SIZE, sock);
+	}
 
 	// publish to sub
-	publishManager.Publish(msg, sock);
+	//publishManager.Publish(msg, sock);
 
 }

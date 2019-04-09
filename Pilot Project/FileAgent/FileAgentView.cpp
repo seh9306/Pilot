@@ -108,15 +108,49 @@ CFileAgentDoc* CFileAgentView::GetDocument() const // 디버그되지 않은 버
 void CFileAgentView::AddItem(WIN32_FIND_DATA& file)
 {
 	files.push_back(file);
-	//int index = fileCListCtrl.InsertItem(itemIndex++, param_string);
+}
+
+void CFileAgentView::ClearItem()
+{
+	files.clear();
+}
+
+int CFileAgentView::GetItemSize()
+{
+	return files.size();
+}
+
+int CFileAgentView::GetListSize()
+{
+	return listSize;
+}
+
+void CFileAgentView::SetListSize(int listSize)
+{
+	this->listSize = listSize;
+}
+
+DWORD CFileAgentView::GenerateShowNumber()
+{
+	return ++showNumber;
+}
+
+DWORD CFileAgentView::GetShowNumber()
+{
+	return showNumber;
 }
 
 void CFileAgentView::SetItemCountEx(int count)
 {
-	fileCListCtrl.SetItemCountEx(count);
+	if (count == -1) {
+		fileCListCtrl.SetItemCountEx(listSize);
+	}
+	else 
+	{
+		fileCListCtrl.SetItemCountEx(count);
+	}
 }
 // CFileAgentView 메시지 처리기
-
 int CFileAgentView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (CView::OnCreate(lpCreateStruct) == -1)
@@ -183,8 +217,8 @@ afx_msg void CFileAgentView::OnExploreBtnClicked()
 
 	dirCEdit.GetWindowTextW(dir);
 	strcpy_s(pCharDir, CT2A(dir));
-
-	fileAgentSocket->Show(pCharDir);
+	// @issue
+	//fileAgentSocket->Show(pCharDir);
 }
 // @issue
 // List item dbclick handler

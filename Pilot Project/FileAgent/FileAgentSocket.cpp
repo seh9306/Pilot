@@ -1,7 +1,11 @@
 #include "stdafx.h"
 #include "FileAgentView.h"
 #include "FileAgentSocket.h"
+
+#include "SubscribeProcessor.h"
 #include "ShowProcessor.h"
+#include "ShowAddProcessor.h"
+
 #include "Receiver.h"
 #include <thread>
 
@@ -16,9 +20,10 @@ FileAgentSocket::FileAgentSocket()
 	// Create IO CompletionPort
 	hCompletionPort = CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, 1);
 
+	packetProcessors.push_back(new SubscribeProcessor());
 	packetProcessors.push_back(new ShowProcessor());
 	packetProcessors.push_back(new ShowProcessor());
-	packetProcessors.push_back(new ShowProcessor());
+	packetProcessors.push_back(new ShowAddProcessor());
 }
 
 // @issue
@@ -57,7 +62,7 @@ void FileAgentSocket::Connect(char *ipAddress, int port)
 	if (cleanSocket == true)
 	{
 		closesocket(fileAgentSocket);
-		fileAgentSocket = socket(AF_INET, SOCK_STREAM, 0);
+		fileAgentSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
 		TRACE(TEXT("새로운 소켓 개방"));
 	} 
 	else
@@ -103,7 +108,6 @@ SOCKET FileAgentSocket::GetSocket()
 {
 	return fileAgentSocket;
 }
-
 // @issue
 #include <iostream>
 void FileAgentSocket::Subscribe(char * dir)
@@ -114,13 +118,12 @@ void FileAgentSocket::Subscribe(char * dir)
 	dataBuf.len = 0 + PROTOCOL_TYPE_SIZE;
 
 	int length = strlen(dir);
+	
 	memcpy(dataBuf.buf + dataBuf.len, &length, sizeof(int));
 	dataBuf.len += sizeof(int);
 
 	memcpy(dataBuf.buf + dataBuf.len, dir, length + NULL_VALUE_SIZE);
 	dataBuf.len += strlen(dir) + NULL_VALUE_SIZE;
-
-	std::cout << "여기는 socket :: " << dir << std::endl;
 
 	if (WSASend(fileAgentSocket, &dataBuf, 1, (LPDWORD)&sendBytes, 0, NULL, NULL) == SOCKET_ERROR)
 	{
@@ -131,25 +134,25 @@ void FileAgentSocket::Subscribe(char * dir)
 		char temp[24];
 		sprintf_s(temp, "%d", GetLastError());
 		TRACE(temp);
-		//fileAgentView.AddItem(TEXT("전송 실패"));
 	}
-	else
-	{
-		//fileAgentView.AddItem(TEXT("보내기 완료"));
-	}
+
 }
 
-void FileAgentSocket::Show(char* dir)
+void FileAgentSocket::Show(char* dir, DWORD showNumber)
 {
 	dataBuf.buf = buffer;
 
 	dataBuf.buf[0] = kShow;
 	dataBuf.len = 0 + PROTOCOL_TYPE_SIZE;
 
+	memcpy(dataBuf.buf + dataBuf.len, &showNumber, sizeof(DWORD));
+	dataBuf.len += sizeof(DWORD);
+
 	int length = strlen(dir);
+
 	memcpy(dataBuf.buf + dataBuf.len, &length, sizeof(int));
 	dataBuf.len += sizeof(int);
-
+	
 	memcpy(dataBuf.buf + dataBuf.len, dir, length + NULL_VALUE_SIZE);
 	dataBuf.len += strlen(dir) + NULL_VALUE_SIZE;
 

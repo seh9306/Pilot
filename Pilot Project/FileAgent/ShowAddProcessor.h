@@ -1,14 +1,14 @@
-#ifndef SHOWPROCESSOR_H
-#define SHOWPROCESSOR_H
+#ifndef SHOWADDPROCESSOR_H
+#define SHOWADDPROCESSOR_H
 
 #include "PacketProcessor.h"
 
-class ShowProcessor :
+class ShowAddProcessor :
 	public PacketProcessor
 {
 public:
-	ShowProcessor();
-	virtual ~ShowProcessor();
+	ShowAddProcessor();
+	virtual ~ShowAddProcessor();
 	virtual void PacketProcess(SOCKET sock, char *msg);
 private:
 	WSABUF dataBuf;

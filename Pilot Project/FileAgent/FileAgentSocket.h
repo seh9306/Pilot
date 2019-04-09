@@ -17,7 +17,7 @@ public:
 	void Connect(char *ip, int port);
 	SOCKET GetSocket();
 	void Subscribe(char* dir);
-	void Show(char* dir);
+	void Show(char * dir, DWORD showNumber);
 	void Update();
 	void Delete();
 	void Rename();

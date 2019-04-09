@@ -1,0 +1,79 @@
+#include "stdafx.h"
+
+#include "MainFrm.h"
+#include "FileAgentView.h"
+
+#include "ShowAddProcessor.h"
+
+#include <iostream>
+
+ShowAddProcessor::ShowAddProcessor()
+{
+	CMainFrame* cMainFrame = (CMainFrame*)(AfxGetApp()->GetMainWnd());
+	if (cMainFrame == nullptr)
+	{
+		TRACE(TEXT("get Main Frame failure"));
+	}
+	else
+	{
+		TRACE(TEXT("get Main Frame success"));
+	}
+
+	cFileAgentView = (CFileAgentView*)(cMainFrame->GetActiveView());
+	if (cFileAgentView == nullptr)
+	{
+		TRACE(TEXT("get list control failure"));
+	}
+}
+
+
+ShowAddProcessor::~ShowAddProcessor()
+{
+}
+
+void ShowAddProcessor::PacketProcess(SOCKET sock, char *msg)
+{
+	TRACE(TEXT("Show Processor"));
+
+	int offset = PROTOCOL_TYPE_SIZE;
+	int recvBytes = 0;
+	int flags = 0;
+
+	DWORD showNumber;
+
+	memcpy(&showNumber, msg + offset, sizeof(DWORD));
+
+	// @issue in multi thread
+	if (showNumber != cFileAgentView->GetShowNumber())
+	{
+		return;
+	}
+
+	offset += sizeof(DWORD);
+	
+	WIN32_FIND_DATA file;// = new WIN32_FIND_DATA;
+	int length = 0;
+
+	while (msg[offset] != '\n')
+	{
+		memcpy(&file, msg + offset, WIN_FIND_DATA_FRONT_SIZE);
+		offset += WIN_FIND_DATA_FRONT_SIZE;
+
+		memcpy(&length, msg + offset, sizeof(int));
+		offset += sizeof(int);
+
+		memcpy(&(file.cFileName), CString(msg + offset), (length + NULL_VALUE_SIZE) * 2);
+
+		offset += length + NULL_VALUE_SIZE;
+		// @issue sync
+		cFileAgentView->AddItem(file);
+	}
+	// @issue sync
+	if (cFileAgentView->GetListSize() 
+		- cFileAgentView->GetItemSize() == 0)
+	{
+		cFileAgentView->SetItemCountEx();
+	}
+	
+}
+

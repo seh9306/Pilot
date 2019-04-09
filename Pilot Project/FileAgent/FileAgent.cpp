@@ -137,6 +137,25 @@ int CFileAgentApp::ExitInstance()
 	return CWinApp::ExitInstance();
 }
 
+// @issue read lock 
+char* CFileAgentApp::GetDirectory()
+{
+	return directory;
+}
+
+// @issue write lock 
+void CFileAgentApp::SetDirectory(char* dir, int size)
+{
+	if (dir)
+	{
+		memcpy(directory, dir, size);
+	} 
+	else
+	{
+		directory[0] = NULL;
+	}
+}
+
 // CFileAgentApp 메시지 처리기
 
 

@@ -25,7 +25,6 @@ void Receiver::operator()(HANDLE pComPort, std::vector<PacketProcessor *> &packe
 			free(perIoData);
 			continue;
 		}
-		TRACE(TEXT("수신수신수신"));
 		// decompress packet
 		// ...
 
@@ -38,7 +37,6 @@ void Receiver::operator()(HANDLE pComPort, std::vector<PacketProcessor *> &packe
 				perIoData->wsaBuf.buf); 
 		}
 		else {
-			TRACE(TEXT("NULL\n"));
 			std::cout << "NULL~" << std::endl;
 		}
 

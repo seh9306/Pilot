@@ -29,7 +29,13 @@ protected: // serialization에서만 만들어집니다.
 public:
 	CFileAgentDoc* GetDocument() const;
 	void AddItem(WIN32_FIND_DATA& file);
-	void SetItemCountEx(int count);
+	void ClearItem();
+	int GetItemSize();
+	int GetListSize();
+	void SetListSize(int listSize);
+	DWORD GenerateShowNumber();
+	DWORD GetShowNumber();
+	void SetItemCountEx(int count = -1);
 	
 	CListCtrl fileCListCtrl;
 	
@@ -77,6 +83,8 @@ public:
 	afx_msg void OnLvnGetdispinfoList(NMHDR *pNMHDR, LRESULT *pResult);
 private:
 	int itemIndex = 0;
+	int listSize = 0;
+	DWORD showNumber = 0;
 
 	CString ip;
 	CString port;

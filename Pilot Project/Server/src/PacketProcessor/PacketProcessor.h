@@ -4,6 +4,7 @@
 #define NUM_OF_PACKET_PROCESSOR 5
 
 #define SUB_HEADER_SIZE 5
+#define SHOW_HEADER_SIZE 9
 
 #define PROTOCOL_TYPE_SIZE 1
 #define WIN_FIND_DATA_FRONT_SIZE 36
@@ -13,6 +14,7 @@ enum protocolType {
 	kSubscribe = 0,
 	kUnSubscribe = 1,
 	kShow,
+	kShowAdd,
 	kCreate,
 	kRename,
 	kDelete,
