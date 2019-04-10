@@ -110,6 +110,22 @@ void CFileAgentView::AddItem(WIN32_FIND_DATA& file)
 	files.push_back(file);
 }
 
+void CFileAgentView::DeleteItem(char* fileName)
+{
+	int index = 0;
+	char temp[MAX_PATH];
+	for (WIN32_FIND_DATA file : files) 
+	{
+		sprintf(temp, "%s", file.cFileName);
+		if (!strcmp(temp, fileName))
+		{
+			files.erase(files.begin() + index);
+			break;
+		}
+		index++;
+	}
+}
+
 void CFileAgentView::ClearItem()
 {
 	files.clear();
@@ -156,7 +172,7 @@ int CFileAgentView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CView::OnCreate(lpCreateStruct) == -1)
 		return -1;
 	
-	fileCListCtrl.Create(WS_BORDER | WS_VISIBLE | LVS_OWNERDATA | LVS_REPORT, CRect(30, 30, 180, 180), this, FILECLISTCTRL_ID);
+	fileCListCtrl.Create(WS_BORDER | WS_VISIBLE | LVS_OWNERDATA | LVS_REPORT | LVS_EDITLABELS, CRect(30, 30, 180, 180), this, FILECLISTCTRL_ID);
 	fileCListCtrl.InsertColumn(0, TEXT("이름"), LVCF_TEXT, 150);
 	fileCListCtrl.InsertColumn(1, TEXT("수정한 날짜"), LVCF_TEXT, 130);
 	fileCListCtrl.InsertColumn(1, TEXT("만든 날짜"), LVCF_TEXT, 130);
@@ -238,7 +254,8 @@ void CFileAgentView::OnItemDblclked(NMHDR * pNMHDR, LRESULT * pResult)
 	CString attr;
 	sIndexValue = fileCListCtrl.GetItemText(itemid, 0);
 	attr = fileCListCtrl.GetItemText(itemid, 3);
-
+	std::wcout << (const wchar_t*)sIndexValue << std::endl;
+	std::cout << "왜죠?" << std::endl;
 	if ((DWORD)_ttoi((LPCTSTR)attr) & FILE_ATTRIBUTE_DIRECTORY && sIndexValue != CString("."))
 	{
 		FileAgentSocket *fileAgentSocket = FileAgentSocket::GetInstance();
@@ -246,7 +263,7 @@ void CFileAgentView::OnItemDblclked(NMHDR * pNMHDR, LRESULT * pResult)
 		SetItemCountEx(0);
 		files.clear();
 		
-		if (sIndexValue == CString(".."))
+		if (!sIndexValue.Compare(TEXT("..")))
 		{
 			int i = dir.GetLength() - 2;
 			for (; i > 0; i--)
@@ -265,11 +282,36 @@ void CFileAgentView::OnItemDblclked(NMHDR * pNMHDR, LRESULT * pResult)
 		{
 			dir += sIndexValue + CString("\\");
 		}
-		strcpy_s(pCharDir, CT2A(dir));
-		dirCEdit.SetWindowTextW(dir);
 		
+		dirCEdit.SetWindowTextW(dir);
+		strcpy_s(pCharDir, CT2A(dir));
 		fileAgentSocket->Subscribe(pCharDir);
 	}
+}
+
+// key down
+// select menu
+void CFileAgentView::DeleteFileRequest()
+{
+	POSITION pos = fileCListCtrl.GetFirstSelectedItemPosition();
+	int nItem = fileCListCtrl.GetNextSelectedItem(pos);
+
+	strcpy_s(pFileName, CT2A(fileCListCtrl.GetItemText(nItem, 0)));
+
+	char attribute = _ttoi(fileCListCtrl.GetItemText(nItem, 3)) & 16;
+
+	FileAgentSocket *fileAgentSocket = FileAgentSocket::GetInstance();
+	fileAgentSocket->Delete(pCharDir, pFileName, attribute);
+}
+
+// key down
+// select menu
+void CFileAgentView::RenameFileRequest()
+{
+	POSITION pos = fileCListCtrl.GetFirstSelectedItemPosition();
+	int nItem = fileCListCtrl.GetNextSelectedItem(pos);
+
+	fileCListCtrl.EditLabel(nItem);
 }
 
 void CFileAgentView::OnListKeyDown(NMHDR * pNMHDR, LRESULT * pResult)
@@ -278,14 +320,13 @@ void CFileAgentView::OnListKeyDown(NMHDR * pNMHDR, LRESULT * pResult)
 	int key = pLVKeyDow->wVKey;
 	if (key == VK_DELETE)
 	{
-		POSITION pos = fileCListCtrl.GetFirstSelectedItemPosition();
-		int nItem = fileCListCtrl.GetNextSelectedItem(pos);
-
-		FileAgentSocket *fileAgentSocket = FileAgentSocket::GetInstance();
-		fileAgentSocket->Delete(pCharDir, (LPSTR)(LPCTSTR)fileCListCtrl.GetItemText(nItem, 0));
+		DeleteFileRequest();
+	}
+	else if(key == VK_F2)
+	{
+		RenameFileRequest();
 	}
 	
-	//std::cout << "a?? :: " << nItem << std::endl;
 }
 
 LRESULT CFileAgentView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)

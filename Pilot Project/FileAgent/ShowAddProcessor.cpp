@@ -1,9 +1,8 @@
 #include "stdafx.h"
 
-#include "MainFrm.h"
-#include "FileAgentView.h"
-
 #include "ShowAddProcessor.h"
+#include "FileAgentView.h"
+#include "MainFrm.h"
 
 #include <iostream>
 
@@ -33,11 +32,7 @@ ShowAddProcessor::~ShowAddProcessor()
 
 void ShowAddProcessor::PacketProcess(SOCKET sock, char *msg)
 {
-	TRACE(TEXT("Show Processor"));
-
 	int offset = PROTOCOL_TYPE_SIZE;
-	int recvBytes = 0;
-	int flags = 0;
 
 	DWORD showNumber;
 

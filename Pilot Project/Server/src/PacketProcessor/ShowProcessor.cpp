@@ -15,7 +15,6 @@ ShowProcessor::~ShowProcessor()
 
 void ShowProcessor::PacketProcess(SOCKET sock, char *msg)
 {
-	std::cout << "Show Processor" << std::endl;
 	PublishManager& publishManager = PublishManager::GetInstance();
 
 	int length = 0;

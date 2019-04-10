@@ -20,7 +20,7 @@ public:
 	void UnSubscribe(char* dir);
 	void Show(char * dir, DWORD showNumber);
 	void Update();
-	void Delete(char* dir, char* fileName);
+	void Delete(char * dir, char * fileName, char attribute);
 	void Rename();
 private:
 	FileAgentSocket();

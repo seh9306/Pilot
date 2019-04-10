@@ -183,14 +183,18 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CreateProcessor.h" />
+    <ClInclude Include="DeleteProcessor.h" />
     <ClInclude Include="FileAgent.h" />
     <ClInclude Include="FileAgentDoc.h" />
     <ClInclude Include="FileAgentView.h" />
     <ClInclude Include="FileAgentSocket.h" />
     <ClInclude Include="MainFrm.h" />
+    <ClInclude Include="MoveProcessor.h" />
     <ClInclude Include="NetworkData.h" />
     <ClInclude Include="PacketProcessor.h" />
     <ClInclude Include="Receiver.h" />
+    <ClInclude Include="RenameProcessor.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="ShowProcessor.h" />
     <ClInclude Include="stdafx.h" />
@@ -199,12 +203,16 @@
     <ClInclude Include="ShowAddProcessor.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CreateProcessor.cpp" />
+    <ClCompile Include="DeleteProcessor.cpp" />
     <ClCompile Include="FileAgent.cpp" />
     <ClCompile Include="FileAgentDoc.cpp" />
     <ClCompile Include="FileAgentView.cpp" />
     <ClCompile Include="FileAgentSocket.cpp" />
     <ClCompile Include="MainFrm.cpp" />
+    <ClCompile Include="MoveProcessor.cpp" />
     <ClCompile Include="Receiver.cpp" />
+    <ClCompile Include="RenameProcessor.cpp" />
     <ClCompile Include="ShowProcessor.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

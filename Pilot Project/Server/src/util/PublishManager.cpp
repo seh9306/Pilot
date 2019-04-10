@@ -27,7 +27,7 @@ PublishManager& PublishManager::GetInstance()
 
 bool PublishManager::Publish(char * dir, SOCKET sock)
 {
-	FileManager fileManager = FileManager::GetInstance();
+	FileManager& fileManager = FileManager::GetInstance();
 
 	std::list<WIN32_FIND_DATA>* files = fileManager.GetFileList(dir + SUB_HEADER_SIZE + sizeof(DWORD));
 
@@ -135,9 +135,27 @@ bool PublishManager::Publish(char * dir, SOCKET sock)
 	return true;
 }
 
-bool PublishManager::Publish(char * dir, std::list<SOCKET> socks)
+bool PublishManager::Publish(char * msg, std::list<SOCKET>& socks, int size)
 {
-	return false;
+	WSABUF wsaBuf;
+	wsaBuf.buf = msg;
+	wsaBuf.len = size;
+	DWORD length = 0;
+
+	for (SOCKET sock : socks)
+	{
+		std::cout << "Àü¼Û" << std::endl;
+		if (WSASend(sock, &wsaBuf, 1,
+			&length, 0, NULL, NULL) == SOCKET_ERROR)
+		{
+			if (WSAGetLastError() != WSA_IO_PENDING)
+			{
+				std::cout << "WSASend() error :: " << GetLastError() << std::endl;
+			}
+				
+		}
+	}
+	return true;
 }
 
 void PublishManager::sSubscribe(char * msg, SOCKET sock)

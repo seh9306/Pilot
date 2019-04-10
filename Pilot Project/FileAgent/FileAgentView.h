@@ -29,6 +29,7 @@ protected: // serialization에서만 만들어집니다.
 public:
 	CFileAgentDoc* GetDocument() const;
 	void AddItem(WIN32_FIND_DATA& file);
+	void DeleteItem(char * fileName);
 	void ClearItem();
 	int GetItemSize();
 	int GetListSize();
@@ -79,6 +80,8 @@ public:
 	afx_msg void OnConeectBtnClicked();
 	afx_msg void OnExploreBtnClicked();
 	afx_msg void OnItemDblclked(NMHDR* pNMHDR, LRESULT* pResult);
+	void DeleteFileRequest();
+	void RenameFileRequest();
 	afx_msg void OnListKeyDown(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnLvnGetdispinfoList(NMHDR *pNMHDR, LRESULT *pResult);
@@ -93,6 +96,7 @@ private:
 	char pCharIp[15];
 	u_short uShortPort;
 	char pCharDir[MAX_PATH];
+	char pFileName[MAX_PATH];
 	
 	char buffer[1024];
 	

@@ -76,11 +76,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\Park\Source\Repos\seh9306\Pilot Project\Server\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Park\Desktop\pilot project\Pilot Project\Server\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>C:\Program Files %28x86%29\Windows Kits\10\Lib\10.0.10150.0\ucrt\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -119,7 +120,11 @@
   <ItemGroup>
     <ClCompile Include="src\Error\ErrorHandle.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\PacketProcessor\CreateProcessor.cpp" />
+    <ClCompile Include="src\PacketProcessor\DeleteProcessor.cpp" />
+    <ClCompile Include="src\PacketProcessor\MoveProcessor.cpp" />
     <ClCompile Include="src\PacketProcessor\PublishProcessor.cpp" />
+    <ClCompile Include="src\PacketProcessor\RenameProcessor.cpp" />
     <ClCompile Include="src\PacketProcessor\ShowProcessor.cpp" />
     <ClCompile Include="src\PacketProcessor\SubscribeProcessor.cpp" />
     <ClCompile Include="src\PacketProcessor\UnSubscribeProcessor.cpp" />
@@ -130,8 +135,12 @@
     <ClCompile Include="src\Util\SubscribeManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\PacketProcessor\CreateProcessor.h" />
+    <ClInclude Include="src\PacketProcessor\DeleteProcessor.h" />
+    <ClInclude Include="src\PacketProcessor\MoveProcessor.h" />
     <ClInclude Include="src\PacketProcessor\PacketProcessor.h" />
     <ClInclude Include="src\PacketProcessor\PublishProcessor.h" />
+    <ClInclude Include="src\PacketProcessor\RenameProcessor.h" />
     <ClInclude Include="src\PacketProcessor\ShowProcessor.h" />
     <ClInclude Include="src\PacketProcessor\SubscribeProcessor.h" />
     <ClInclude Include="src\PacketProcessor\UnSubscribeProcessor.h" />

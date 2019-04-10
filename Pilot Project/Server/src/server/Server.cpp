@@ -12,6 +12,11 @@
 #include "../PacketProcessor/SubscribeProcessor.h"
 #include "../PacketProcessor/UnSubscribeProcessor.h"
 #include "../PacketProcessor/ShowProcessor.h"
+// ShowAddProcessor.h
+#include "../PacketProcessor/CreateProcessor.h"
+#include "../PacketProcessor/RenameProcessor.h"
+#include "../PacketProcessor/DeleteProcessor.h"
+#include "../PacketProcessor/MoveProcessor.h"
 
 extern void error_handle(char *);
 
@@ -49,6 +54,11 @@ bool Server::Init()
 	packetProcessors.push_back(new SubscribeProcessor());
 	packetProcessors.push_back(new UnSubscribeProcessor());
 	packetProcessors.push_back(new ShowProcessor());
+	packetProcessors.push_back(nullptr); // ShowAdd
+	packetProcessors.push_back(new CreateProcessor());
+	packetProcessors.push_back(new RenameProcessor());
+	packetProcessors.push_back(new DeleteProcessor());
+	packetProcessors.push_back(new MoveProcessor());
 
 	// Create IO CompletionPort
 	hCompletionPort = CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, 0);

@@ -46,5 +46,38 @@ std::list<WIN32_FIND_DATA>* FileManager::GetFileList(char *dir)
 
 	return files;
 }
+// @issue
+#include <iostream>
+bool FileManager::DeleteFileByFileName(char* dir, char* fileName, char type)
+{
+	char* temp = new char[strlen(dir) + strlen(fileName) + 1];
+
+	temp[0] = 0;
+
+	strcat(temp, dir);
+	strcat(temp, fileName);
+
+	if (type == 1)
+	{
+		// @issue recursion delete
+		RemoveDirectory(temp);
+	}
+	else
+	{
+		HANDLE hFile;
+
+		hFile = CreateFile(temp, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_DIRECTORY | FILE_FLAG_DELETE_ON_CLOSE, NULL);
+		if (hFile == INVALID_HANDLE_VALUE)
+		{
+			delete[]temp;
+			return false;
+		}
+
+		CloseHandle(hFile);
+	}
+	
+	delete[]temp;
+	return true;
+}
 
 

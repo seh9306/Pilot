@@ -5,6 +5,10 @@
 #include "SubscribeProcessor.h"
 #include "ShowProcessor.h"
 #include "ShowAddProcessor.h"
+#include "CreateProcessor.h"
+#include "RenameProcessor.h"
+#include "DeleteProcessor.h"
+#include "MoveProcessor.h"
 
 #include "Receiver.h"
 #include <thread>
@@ -16,14 +20,19 @@ FileAgentSocket::FileAgentSocket()
 	WSAStartup(0x0202, &wsaData);
 	fileAgentSocket = socket(AF_INET, SOCK_STREAM, 0);
 	dataBuf.len = 0;
-	TRACE(TEXT("FileAgentSocket »ý¼º"));
+
 	// Create IO CompletionPort
 	hCompletionPort = CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, 1);
 
 	packetProcessors.push_back(new SubscribeProcessor());
-	packetProcessors.push_back(new ShowProcessor());
+	packetProcessors.push_back(nullptr); // UnSubscribe
 	packetProcessors.push_back(new ShowProcessor());
 	packetProcessors.push_back(new ShowAddProcessor());
+	packetProcessors.push_back(new CreateProcessor());
+	packetProcessors.push_back(new RenameProcessor());
+	packetProcessors.push_back(new DeleteProcessor());
+	packetProcessors.push_back(new MoveProcessor());
+
 }
 
 // @issue
@@ -192,23 +201,41 @@ void FileAgentSocket::Update()
 {
 }
 
-void FileAgentSocket::Delete(char* dir, char* fileName)
+void FileAgentSocket::Delete(char* dir, char* fileName, char attribute)
 {
 	dataBuf.buf = buffer;
 
 	dataBuf.buf[0] = kDelete;
 	dataBuf.len = 0 + PROTOCOL_TYPE_SIZE;
 
-	int length = strlen(dir) + strlen(fileName) + NULL_VALUE_SIZE;
+	if (attribute & FILE_ATTRIBUTE_DIRECTORY)
+	{
+		dataBuf.buf[1] = 1;
+	}
+	else
+	{
+		dataBuf.buf[1] = 0;
+	}
+
+	dataBuf.len += 1;
+
+	// dir
+	int length = strlen(dir) + NULL_VALUE_SIZE;
 
 	memcpy(dataBuf.buf + dataBuf.len, &length, sizeof(int));
 	dataBuf.len += sizeof(int);
 
 	memcpy(dataBuf.buf + dataBuf.len, dir, length);
-	dataBuf.len += strlen(dir);
+	dataBuf.len += length;
 
-	memcpy(dataBuf.buf + dataBuf.len, fileName, length + NULL_VALUE_SIZE);
-	dataBuf.len += strlen(fileName) + NULL_VALUE_SIZE;
+	// fileName
+	length = strlen(fileName) + NULL_VALUE_SIZE;
+
+	memcpy(dataBuf.buf + dataBuf.len, &length, sizeof(int));
+	dataBuf.len += sizeof(int);
+
+	memcpy(dataBuf.buf + dataBuf.len, fileName, length);
+	dataBuf.len += length;
 
 	if (WSASend(fileAgentSocket, &dataBuf, 1, (LPDWORD)&sendBytes, 0, NULL, NULL) == SOCKET_ERROR)
 	{

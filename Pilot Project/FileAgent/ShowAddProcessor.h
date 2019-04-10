@@ -3,6 +3,8 @@
 
 #include "PacketProcessor.h"
 
+class CFileAgentView;
+
 class ShowAddProcessor :
 	public PacketProcessor
 {

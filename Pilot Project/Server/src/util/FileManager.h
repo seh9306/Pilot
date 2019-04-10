@@ -10,6 +10,7 @@ public:
 	~FileManager();
 	static FileManager& GetInstance();
 	std::list<WIN32_FIND_DATA>* GetFileList(char *dir);
+	bool DeleteFileByFileName(char * dir, char * fileName, char type);
 private:
 	FileManager();
 };

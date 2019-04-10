@@ -10,9 +10,9 @@ public:
 	virtual ~PublishManager();
 	static PublishManager& GetInstance();
 	bool Publish(char *dir, SOCKET sock);
-	bool Publish(char *dir, std::list<SOCKET> socks);
-	void sSubscribe(char *msg, SOCKET sock);
-	void fSubscribe(char *dir, SOCKET sock);
+	bool Publish(char * msg, std::list<SOCKET>& socks, int size);
+	void sSubscribe(char* msg, SOCKET sock);
+	void fSubscribe(char* dir, SOCKET sock);
 private:
 	PublishManager();
 };
