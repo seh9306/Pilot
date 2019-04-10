@@ -37,6 +37,8 @@ bool SubscribeManager::Subscribe(char *dir, SOCKET sock)
 		sockets.insert({ dirString, temp });
 	}
 
+	dirs.insert({ sock, dirString });
+
 	return true;
 }
 
@@ -75,6 +77,18 @@ std::list<SOCKET> *SubscribeManager::GetSocketsByDir(char *dir)
 	auto search = sockets.find(dirString);
 
 	if (search != sockets.end()) 
+	{
+		return search->second;
+	}
+
+	return nullptr;
+}
+
+std::string SubscribeManager::GetDirBySocket(SOCKET sock)
+{
+	auto search = dirs.find(sock);
+
+	if (search != dirs.end())
 	{
 		return search->second;
 	}

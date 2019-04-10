@@ -246,7 +246,49 @@ void FileAgentSocket::Delete(char* dir, char* fileName, char attribute)
 	}
 }
 
-void FileAgentSocket::Rename()
+// @issue validate data..
+void FileAgentSocket::Rename(char* dir, char* oldName, char* newName)
 {
+	dataBuf.buf = buffer;
+
+	dataBuf.buf[0] = kRename;
+	dataBuf.len = 0 + PROTOCOL_TYPE_SIZE;
+
+	// dir
+	int length = strlen(dir) + NULL_VALUE_SIZE;
+
+	memcpy(dataBuf.buf + dataBuf.len, &length, sizeof(int));
+	dataBuf.len += sizeof(int);
+
+	memcpy(dataBuf.buf + dataBuf.len, dir, length);
+	dataBuf.len += length;
+
+	// oldFileName
+	length = strlen(oldName) + NULL_VALUE_SIZE;
+
+	memcpy(dataBuf.buf + dataBuf.len, &length, sizeof(int));
+	dataBuf.len += sizeof(int);
+
+	memcpy(dataBuf.buf + dataBuf.len, oldName, length);
+	dataBuf.len += length;
+
+	// newFileName
+	length = strlen(newName) + NULL_VALUE_SIZE;
+
+	memcpy(dataBuf.buf + dataBuf.len, &length, sizeof(int));
+	dataBuf.len += sizeof(int);
+
+	memcpy(dataBuf.buf + dataBuf.len, newName, length);
+	dataBuf.len += length;
+
+	if (WSASend(fileAgentSocket, &dataBuf, 1, (LPDWORD)&sendBytes, 0, NULL, NULL) == SOCKET_ERROR)
+	{
+		if (WSAGetLastError() != WSA_IO_PENDING)
+		{
+			TRACE("error");
+		}
+	}
+
+	std::cout << "Àü¼Û" << std::endl;
 }
 

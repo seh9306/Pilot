@@ -1,13 +1,16 @@
-#include "../NetworkData.h"
-#include "../../PacketProcessor/PacketProcessor.h"
+#include "Server/NetworkData.h"
+#include "PacketProcessor/PacketProcessor.h"
+#include "Util/SubscribeManager.h"
 #include "Receiver.h"
 
 #include <iostream>
+#include <string>
 
 void Receiver::operator()(HANDLE pComPort, std::vector<PacketProcessor *> &packetProcessors)
 {
 	hCompletionPort = pComPort;
 	std::cout << id << std::endl;
+	SubscribeManager& subcribeManager = SubscribeManager::GetInstance();
 	while (true) 
 	{
 		GetQueuedCompletionStatus(hCompletionPort,
@@ -19,6 +22,9 @@ void Receiver::operator()(HANDLE pComPort, std::vector<PacketProcessor *> &packe
 
 		if (bytesTransferred == 0)
 		{
+			std::string temp = subcribeManager.GetDirBySocket(perHandleData->hClntSock);
+			char *cstr = (char *)temp.c_str();
+			subcribeManager.UnSubscribe(cstr, perHandleData->hClntSock);
 			std::cout << "나가셨습니다" << std::endl;
 			closesocket(perHandleData->hClntSock);
 			free(perHandleData);

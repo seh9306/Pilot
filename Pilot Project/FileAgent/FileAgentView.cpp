@@ -31,6 +31,7 @@ BEGIN_MESSAGE_MAP(CFileAgentView, CView)
 	ON_NOTIFY(LVN_GETDISPINFO, FILECLISTCTRL_ID, &CFileAgentView::OnLvnGetdispinfoList)
 	ON_NOTIFY(NM_DBLCLK, FILECLISTCTRL_ID, &CFileAgentView::OnItemDblclked)
 	ON_NOTIFY(LVN_KEYDOWN, FILECLISTCTRL_ID, &CFileAgentView::OnListKeyDown)
+	ON_NOTIFY(LVN_ENDLABELEDIT, FILECLISTCTRL_ID, &CFileAgentView::OnEndLabelEdit)
 	ON_WM_CREATE()
 	ON_WM_SIZE()
 END_MESSAGE_MAP()
@@ -109,20 +110,41 @@ void CFileAgentView::AddItem(WIN32_FIND_DATA& file)
 {
 	files.push_back(file);
 }
+#include <iostream>
+
 
 void CFileAgentView::DeleteItem(char* fileName)
 {
 	int index = 0;
 	char temp[MAX_PATH];
-	for (WIN32_FIND_DATA file : files) 
+	for (WIN32_FIND_DATA& file : files) 
 	{
-		sprintf(temp, "%s", file.cFileName);
+		strcpy_s(temp, CT2A(file.cFileName));
 		if (!strcmp(temp, fileName))
 		{
 			files.erase(files.begin() + index);
 			break;
 		}
 		index++;
+	}
+}
+#include <iostream>
+void CFileAgentView::RenameItem(char* oldName, char* newName)
+{
+	char temp[MAX_PATH];
+
+	for (WIN32_FIND_DATA& file : files)
+	{
+		strcpy_s(temp, CT2A(file.cFileName));
+		if (!strcmp(temp, oldName))
+		{
+			std::wstring text_wchar(strlen(newName)+1, L'#');
+
+			mbstowcs(&text_wchar[0], newName, strlen(newName) + 1);
+			wcscpy(file.cFileName, text_wchar.c_str());
+			SetItemCountEx(listSize);	
+			break;
+		}
 	}
 }
 
@@ -159,7 +181,8 @@ DWORD CFileAgentView::GetShowNumber()
 void CFileAgentView::SetItemCountEx(int count)
 {
 	if (count == -1) {
-		fileCListCtrl.SetItemCountEx(listSize);
+		fileCListCtrl.SetItemCountEx(files.size());
+		fileCListCtrl.Invalidate();
 	}
 	else 
 	{
@@ -192,7 +215,7 @@ int CFileAgentView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	iPAddressCEdit.SetWindowTextW(TEXT("127.0.0.1"));
 	portCEdit.SetWindowTextW(TEXT("9030"));
-	dirCEdit.SetWindowTextW(TEXT("C:\\Windows\\WinSxS\\"));
+	dirCEdit.SetWindowTextW(TEXT("C:\\"));
 	//dirCEdit.SetWindowTextW(TEXT("C:\\Windows\\WinSxS\\"));
 
 	exploreBtn.Create(TEXT("탐색"), WS_VISIBLE, CRect(1000, 0, 1050, 20), this, EXPLOREBTN_ID);
@@ -318,6 +341,7 @@ void CFileAgentView::OnListKeyDown(NMHDR * pNMHDR, LRESULT * pResult)
 {
 	LV_KEYDOWN* pLVKeyDow = (LV_KEYDOWN*)pNMHDR;
 	int key = pLVKeyDow->wVKey;
+	std::cout << "???!@#!@#!@!@$d이게?" << std::endl;
 	if (key == VK_DELETE)
 	{
 		DeleteFileRequest();
@@ -327,6 +351,27 @@ void CFileAgentView::OnListKeyDown(NMHDR * pNMHDR, LRESULT * pResult)
 		RenameFileRequest();
 	}
 	
+}
+
+void CFileAgentView::OnEndLabelEdit(NMHDR * pNMHDR, LRESULT * pResult)
+{
+	NMLVDISPINFO *pDispInfo = reinterpret_cast<NMLVDISPINFO*>(pNMHDR);
+
+	CString str;
+
+	CEdit* pEdit = fileCListCtrl.GetEditControl();
+	pEdit->GetWindowTextW(str);
+
+	strcpy_s(pFileOldName, CT2A(fileCListCtrl.GetItemText(pDispInfo->item.iItem, 0)));
+	strcpy_s(pFileNewName, CT2A(str));
+
+	std::wcout << (const wchar_t *)str << std::endl;
+	std::wcout << (const wchar_t *)fileCListCtrl.GetItemText(pDispInfo->item.iItem,0) << std::endl;
+
+	FileAgentSocket *fileAgentSocket = FileAgentSocket::GetInstance();
+	fileAgentSocket->Rename(pCharDir, pFileOldName, pFileNewName);
+
+	*pResult = 0;
 }
 
 LRESULT CFileAgentView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
@@ -362,9 +407,11 @@ LRESULT CFileAgentView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		
 	}
-	else 
+	else if ( message == 20000)
 	{
-
+		std::cout << "??" << lParam << std::endl;
+		std::cout << (char *)wParam << std::endl;
+		//fileCListCtrl.SetItemText(lParam, 0, TEXT("!!!"));
 	}
 
 	return CView::WindowProc(message, wParam, lParam);
@@ -412,12 +459,12 @@ void CFileAgentView::OnLvnGetdispinfoList(NMHDR * pNMHDR, LRESULT * pResult)
 	if (pItem->mask & LVIF_TEXT)
 	{
 		CString text;
-
+		
 		//Which column?
 		if (pItem->iSubItem == 0)
 		{
 			//Text is name
-			//std::cout << files[itemid].cFileName << std::endl;
+			//std::wcout << (const wchar_t *)files[itemid].cFileName << std::endl;
 			text = CString(files[itemid].cFileName);
 		}
 		else if (pItem->iSubItem == 1)

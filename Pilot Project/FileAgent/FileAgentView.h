@@ -30,6 +30,7 @@ public:
 	CFileAgentDoc* GetDocument() const;
 	void AddItem(WIN32_FIND_DATA& file);
 	void DeleteItem(char * fileName);
+	void RenameItem(char * oldName, char * newName);
 	void ClearItem();
 	int GetItemSize();
 	int GetListSize();
@@ -83,6 +84,7 @@ public:
 	void DeleteFileRequest();
 	void RenameFileRequest();
 	afx_msg void OnListKeyDown(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnEndLabelEdit(NMHDR * pNMHDR, LRESULT * pResult);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnLvnGetdispinfoList(NMHDR *pNMHDR, LRESULT *pResult);
 private:
@@ -97,7 +99,9 @@ private:
 	u_short uShortPort;
 	char pCharDir[MAX_PATH];
 	char pFileName[MAX_PATH];
-	
+	char pFileOldName[MAX_PATH];
+	char pFileNewName[MAX_PATH];
+
 	char buffer[1024];
 	
 	int sendBytes;

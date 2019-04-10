@@ -3,6 +3,8 @@
 
 #include "PacketProcessor.h"
 
+class CFileAgentView;
+
 class RenameProcessor :
 	public PacketProcessor
 {
@@ -11,6 +13,8 @@ public:
 	~RenameProcessor();
 
 	void PacketProcess(SOCKET sock, char *msg);
+private:
+	CFileAgentView* cFileAgentView;
 };
 
 #endif

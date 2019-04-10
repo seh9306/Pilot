@@ -60,7 +60,10 @@ bool FileManager::DeleteFileByFileName(char* dir, char* fileName, char type)
 	if (type == 1)
 	{
 		// @issue recursion delete
-		RemoveDirectory(temp);
+		bool result = RemoveDirectory(temp);
+
+		delete[]temp;
+		return result;
 	}
 	else
 	{
@@ -80,4 +83,32 @@ bool FileManager::DeleteFileByFileName(char* dir, char* fileName, char type)
 	return true;
 }
 
+bool FileManager::Rename(char* dir, char* oldName, char* newName)
+{
+	char* absOldPath = new char[strlen(dir) + strlen(oldName) + 1];
+	char* absNewPath = new char[strlen(dir) + strlen(newName) + 1];
 
+	absOldPath[0] = 0;
+	absNewPath[0] = 0;
+
+	strcat(absOldPath, dir);
+	strcat(absOldPath, oldName);
+
+	strcat(absNewPath, dir);
+	strcat(absNewPath, newName);
+
+	int result = rename(absOldPath, absNewPath);
+
+	delete[] absOldPath;
+	delete[] absNewPath;
+	std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+	if (result == -1)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+	
+}

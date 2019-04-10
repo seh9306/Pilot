@@ -21,7 +21,7 @@ public:
 	void Show(char * dir, DWORD showNumber);
 	void Update();
 	void Delete(char * dir, char * fileName, char attribute);
-	void Rename();
+	void Rename(char * dir, char * oldName, char * newName);
 private:
 	FileAgentSocket();
 	static FileAgentSocket* fileAgent;

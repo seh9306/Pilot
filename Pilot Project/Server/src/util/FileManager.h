@@ -9,8 +9,9 @@ class FileManager
 public:
 	~FileManager();
 	static FileManager& GetInstance();
-	std::list<WIN32_FIND_DATA>* GetFileList(char *dir);
-	bool DeleteFileByFileName(char * dir, char * fileName, char type);
+	std::list<WIN32_FIND_DATA>* GetFileList(char* dir);
+	bool DeleteFileByFileName(char* dir, char* fileName, char type);
+	bool Rename(char* dir, char* oldName, char* newName);
 private:
 	FileManager();
 };
