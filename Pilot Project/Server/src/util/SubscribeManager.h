@@ -16,7 +16,7 @@ public:
 	~SubscribeManager();
 	static SubscribeManager& GetInstance();
 	bool Subscribe(char *dir, SOCKET sock);
-	bool UnSubscribe(char *dir);
+	bool UnSubscribe(char *dir, SOCKET sock);
 	std::list<SOCKET> *GetSocketsByDir(char *dir);
 };
 

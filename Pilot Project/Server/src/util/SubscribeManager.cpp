@@ -27,16 +27,11 @@ bool SubscribeManager::Subscribe(char *dir, SOCKET sock)
 
 	if (search != sockets.end()) 
 	{
-#ifdef SM_DEBUG
-		std::cout << "subscribe " << dir << std::endl;
-#endif
 		search->second->push_back(sock);
+		std::cout << "구독자 수 : " << search->second->size() << std::endl;
 	}
 	else 
 	{
-#ifdef SM_DEBUG
-		std::cout << "No Processor" << std::endl;
-#endif
 		std::list<SOCKET> *temp = new std::list<SOCKET>();
 		temp->push_back(sock);
 		sockets.insert({ dirString, temp });
@@ -45,10 +40,32 @@ bool SubscribeManager::Subscribe(char *dir, SOCKET sock)
 	return true;
 }
 
-bool SubscribeManager::UnSubscribe(char *dir) 
+bool SubscribeManager::UnSubscribe(char * dir, SOCKET sock)
 {
 	std::string dirString(dir);
-	return false;
+
+	auto search = sockets.find(dirString);
+
+	if (search != sockets.end())
+	{
+		std::list<SOCKET>* temp = search->second;
+		std::list<SOCKET>::iterator it;
+		
+		for (it = temp->begin(); it != temp->end(); it++)
+		{
+			if (*it == sock) 
+			{
+				temp->erase(it);
+				break;
+			}
+		}
+	}
+	else
+	{
+		return false;
+	}
+
+	return true;
 }
 
 std::list<SOCKET> *SubscribeManager::GetSocketsByDir(char *dir) 

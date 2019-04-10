@@ -28,9 +28,9 @@ BEGIN_MESSAGE_MAP(CFileAgentView, CView)
 	ON_COMMAND(ID_FILE_PRINT_PREVIEW, &CView::OnFilePrintPreview)
 	ON_BN_CLICKED(CONNECTBTN_ID, &CFileAgentView::OnConeectBtnClicked)
 	ON_BN_CLICKED(EXPLOREBTN_ID, &CFileAgentView::OnExploreBtnClicked)
-	//NM_DBLCLK(FILECLISTCTRL_ID)
 	ON_NOTIFY(LVN_GETDISPINFO, FILECLISTCTRL_ID, &CFileAgentView::OnLvnGetdispinfoList)
 	ON_NOTIFY(NM_DBLCLK, FILECLISTCTRL_ID, &CFileAgentView::OnItemDblclked)
+	ON_NOTIFY(LVN_KEYDOWN, FILECLISTCTRL_ID, &CFileAgentView::OnListKeyDown)
 	ON_WM_CREATE()
 	ON_WM_SIZE()
 END_MESSAGE_MAP()
@@ -210,15 +210,16 @@ afx_msg void CFileAgentView::OnConeectBtnClicked()
 
 afx_msg void CFileAgentView::OnExploreBtnClicked()
 {
+	FileAgentSocket *fileAgentSocket = FileAgentSocket::GetInstance();
+
+	fileAgentSocket->UnSubscribe(pCharDir);
 	SetItemCountEx(0);
 	files.clear();
 
-	FileAgentSocket *fileAgentSocket = FileAgentSocket::GetInstance();
-
 	dirCEdit.GetWindowTextW(dir);
 	strcpy_s(pCharDir, CT2A(dir));
-	// @issue
-	//fileAgentSocket->Show(pCharDir);
+
+	fileAgentSocket->Subscribe(pCharDir);
 }
 // @issue
 // List item dbclick handler
@@ -238,17 +239,13 @@ void CFileAgentView::OnItemDblclked(NMHDR * pNMHDR, LRESULT * pResult)
 	sIndexValue = fileCListCtrl.GetItemText(itemid, 0);
 	attr = fileCListCtrl.GetItemText(itemid, 3);
 
-	std::wcout << (const wchar_t*)sIndexValue << std::endl;
-	std::wcout << (const wchar_t*)dir << std::endl;
-	std::cout <<  "test " << (DWORD)_ttoi((LPCTSTR)attr) <<  std::endl;
-
 	if ((DWORD)_ttoi((LPCTSTR)attr) & FILE_ATTRIBUTE_DIRECTORY && sIndexValue != CString("."))
 	{
 		FileAgentSocket *fileAgentSocket = FileAgentSocket::GetInstance();
-		//fileAgentSocket->UnSubscribe(dir);
+		fileAgentSocket->UnSubscribe(pCharDir);
 		SetItemCountEx(0);
 		files.clear();
-
+		
 		if (sIndexValue == CString(".."))
 		{
 			int i = dir.GetLength() - 2;
@@ -270,10 +267,26 @@ void CFileAgentView::OnItemDblclked(NMHDR * pNMHDR, LRESULT * pResult)
 		}
 		strcpy_s(pCharDir, CT2A(dir));
 		dirCEdit.SetWindowTextW(dir);
+		
 		fileAgentSocket->Subscribe(pCharDir);
 	}
 }
 
+void CFileAgentView::OnListKeyDown(NMHDR * pNMHDR, LRESULT * pResult)
+{
+	LV_KEYDOWN* pLVKeyDow = (LV_KEYDOWN*)pNMHDR;
+	int key = pLVKeyDow->wVKey;
+	if (key == VK_DELETE)
+	{
+		POSITION pos = fileCListCtrl.GetFirstSelectedItemPosition();
+		int nItem = fileCListCtrl.GetNextSelectedItem(pos);
+
+		FileAgentSocket *fileAgentSocket = FileAgentSocket::GetInstance();
+		fileAgentSocket->Delete(pCharDir, (LPSTR)(LPCTSTR)fileCListCtrl.GetItemText(nItem, 0));
+	}
+	
+	//std::cout << "a?? :: " << nItem << std::endl;
+}
 
 LRESULT CFileAgentView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {

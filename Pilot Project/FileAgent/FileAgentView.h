@@ -79,10 +79,10 @@ public:
 	afx_msg void OnConeectBtnClicked();
 	afx_msg void OnExploreBtnClicked();
 	afx_msg void OnItemDblclked(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnListKeyDown(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnLvnGetdispinfoList(NMHDR *pNMHDR, LRESULT *pResult);
 private:
-	int itemIndex = 0;
 	int listSize = 0;
 	DWORD showNumber = 0;
 

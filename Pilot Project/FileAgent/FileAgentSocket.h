@@ -14,12 +14,13 @@ public:
 	virtual ~FileAgentSocket();
 	static FileAgentSocket* GetInstance();
 	static void releaseInstance();
-	void Connect(char *ip, int port);
 	SOCKET GetSocket();
+	void Connect(char *ip, int port);
 	void Subscribe(char* dir);
+	void UnSubscribe(char* dir);
 	void Show(char * dir, DWORD showNumber);
 	void Update();
-	void Delete();
+	void Delete(char* dir, char* fileName);
 	void Rename();
 private:
 	FileAgentSocket();

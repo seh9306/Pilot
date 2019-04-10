@@ -57,6 +57,11 @@ void FileAgentSocket::releaseInstance()
 	}
 }
 
+SOCKET FileAgentSocket::GetSocket()
+{
+	return fileAgentSocket;
+}
+
 void FileAgentSocket::Connect(char *ipAddress, int port)
 {
 	if (cleanSocket == true)
@@ -104,10 +109,6 @@ void FileAgentSocket::Connect(char *ipAddress, int port)
 	);
 }
 
-SOCKET FileAgentSocket::GetSocket()
-{
-	return fileAgentSocket;
-}
 // @issue
 #include <iostream>
 void FileAgentSocket::Subscribe(char * dir)
@@ -131,11 +132,32 @@ void FileAgentSocket::Subscribe(char * dir)
 		{
 			TRACE("error");
 		}
-		char temp[24];
-		sprintf_s(temp, "%d", GetLastError());
-		TRACE(temp);
 	}
 
+}
+
+void FileAgentSocket::UnSubscribe(char * dir)
+{
+	dataBuf.buf = buffer;
+
+	dataBuf.buf[0] = kUnSubscribe;
+	dataBuf.len = 0 + PROTOCOL_TYPE_SIZE;
+
+	int length = strlen(dir);
+
+	memcpy(dataBuf.buf + dataBuf.len, &length, sizeof(int));
+	dataBuf.len += sizeof(int);
+
+	memcpy(dataBuf.buf + dataBuf.len, dir, length + NULL_VALUE_SIZE);
+	dataBuf.len += strlen(dir) + NULL_VALUE_SIZE;
+
+	if (WSASend(fileAgentSocket, &dataBuf, 1, (LPDWORD)&sendBytes, 0, NULL, NULL) == SOCKET_ERROR)
+	{
+		if (WSAGetLastError() != WSA_IO_PENDING)
+		{
+			TRACE("error");
+		}
+	}
 }
 
 void FileAgentSocket::Show(char* dir, DWORD showNumber)
@@ -170,8 +192,31 @@ void FileAgentSocket::Update()
 {
 }
 
-void FileAgentSocket::Delete()
+void FileAgentSocket::Delete(char* dir, char* fileName)
 {
+	dataBuf.buf = buffer;
+
+	dataBuf.buf[0] = kDelete;
+	dataBuf.len = 0 + PROTOCOL_TYPE_SIZE;
+
+	int length = strlen(dir) + strlen(fileName) + NULL_VALUE_SIZE;
+
+	memcpy(dataBuf.buf + dataBuf.len, &length, sizeof(int));
+	dataBuf.len += sizeof(int);
+
+	memcpy(dataBuf.buf + dataBuf.len, dir, length);
+	dataBuf.len += strlen(dir);
+
+	memcpy(dataBuf.buf + dataBuf.len, fileName, length + NULL_VALUE_SIZE);
+	dataBuf.len += strlen(fileName) + NULL_VALUE_SIZE;
+
+	if (WSASend(fileAgentSocket, &dataBuf, 1, (LPDWORD)&sendBytes, 0, NULL, NULL) == SOCKET_ERROR)
+	{
+		if (WSAGetLastError() != WSA_IO_PENDING)
+		{
+			TRACE("error");
+		}
+	}
 }
 
 void FileAgentSocket::Rename()
