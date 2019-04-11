@@ -99,7 +99,7 @@ void FileAgentSocket::Connect(char *ipAddress, int port)
 	receiver.id = 0;
 	std::thread IOCPThread(receiver, hCompletionPort, packetProcessors);
 	IOCPThread.detach();
-
+	// 메시지 펌핑
 	/*bool connecting = true;
 	std::thread t([&](sockaddr_in* srv_addr)
 	{
@@ -118,6 +118,7 @@ void FileAgentSocket::Connect(char *ipAddress, int port)
 		Sleep(10);
 	}*/
 
+	// @issue TEXT String Table
 	if (connect(fileAgentSocket, (sockaddr *)&srv_addr, sizeof(srv_addr)) == -1) {
 		AfxMessageBox(TEXT("서버와의 연결에 실패하였습니다."));
 		fileAgentSocket = INVALID_SOCKET;

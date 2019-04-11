@@ -128,7 +128,7 @@ void CFileAgentView::DeleteItem(char* fileName)
 		index++;
 	}
 }
-#include <iostream>
+
 void CFileAgentView::RenameItem(char* oldName, char* newName)
 {
 	char temp[MAX_PATH];
@@ -137,16 +137,8 @@ void CFileAgentView::RenameItem(char* oldName, char* newName)
 	{
 		strcpy_s(temp, CT2A(file.cFileName));
 		if (!strcmp(temp, oldName))
-		{
-			std::string str(newName);
-			int size = MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), NULL, 0);
-			std::wstring wstr(size, 0);
-			MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), &wstr[0], size);
-			/*std::wstring text_wchar(strlen(newName)+1, L'#');
-			
-			mbstowcs(&text_wchar[0], newName, strlen(newName) + 1);
-			wcscpy(file.cFileName, text_wchar.c_str());*/
-			wcscpy(file.cFileName, &wstr[0]);
+		{	
+			swprintf_s((wchar_t *)file.cFileName, MAX_PATH, L"%s", CString(newName));
 			SetItemCountEx(listSize);	
 			break;
 		}
@@ -254,7 +246,6 @@ afx_msg void CFileAgentView::OnConeectBtnClicked()
 
 afx_msg void CFileAgentView::OnExploreBtnClicked()
 {
-	std::cout << "버튼 클릭" << std::endl;
 	FileAgentSocket *fileAgentSocket = FileAgentSocket::GetInstance();
 	if (fileAgentSocket->GetSocket() == INVALID_SOCKET)
 	{
@@ -272,7 +263,6 @@ afx_msg void CFileAgentView::OnExploreBtnClicked()
 }
 // @issue
 // List item dbclick handler
-#include <iostream>
 void CFileAgentView::OnItemDblclked(NMHDR * pNMHDR, LRESULT * pResult)
 {
 	LV_DISPINFO* pDispInfo = (LV_DISPINFO*)pNMHDR;
@@ -288,7 +278,6 @@ void CFileAgentView::OnItemDblclked(NMHDR * pNMHDR, LRESULT * pResult)
 	sIndexValue = fileCListCtrl.GetItemText(itemid, 0);
 	attr = fileCListCtrl.GetItemText(itemid, 3);
 	std::wcout << (const wchar_t*)sIndexValue << std::endl;
-	std::cout << "왜죠?" << std::endl;
 	if ((DWORD)_ttoi((LPCTSTR)attr) & FILE_ATTRIBUTE_DIRECTORY && sIndexValue != CString("."))
 	{
 		FileAgentSocket *fileAgentSocket = FileAgentSocket::GetInstance();
@@ -351,7 +340,6 @@ void CFileAgentView::OnListKeyDown(NMHDR * pNMHDR, LRESULT * pResult)
 {
 	LV_KEYDOWN* pLVKeyDow = (LV_KEYDOWN*)pNMHDR;
 	int key = pLVKeyDow->wVKey;
-	std::cout << "???!@#!@#!@!@$d이게?" << std::endl;
 	if (key == VK_DELETE)
 	{
 		DeleteFileRequest();
