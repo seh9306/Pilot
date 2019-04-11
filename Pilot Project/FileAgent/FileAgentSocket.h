@@ -35,6 +35,8 @@ private:
 	char buffer[1024];
 	bool cleanSocket;
 
+	CString stringTableValue;
+
 	PER_HANDLE_DATA *perHandleData;
 	PER_IO_DATA *perIoData;
 	DWORD flags;

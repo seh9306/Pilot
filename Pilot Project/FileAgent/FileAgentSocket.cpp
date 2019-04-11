@@ -83,7 +83,6 @@ void FileAgentSocket::Connect(char *ipAddress, int port)
 	{
 		closesocket(fileAgentSocket);
 		fileAgentSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
-		TRACE(TEXT("새로운 소켓 개방"));
 	} 
 	else
 	{
@@ -120,11 +119,13 @@ void FileAgentSocket::Connect(char *ipAddress, int port)
 
 	// @issue TEXT String Table
 	if (connect(fileAgentSocket, (sockaddr *)&srv_addr, sizeof(srv_addr)) == -1) {
-		AfxMessageBox(TEXT("서버와의 연결에 실패하였습니다."));
+		stringTableValue.LoadStringW(FILE_CLIENT_CONNECT_FAIL);
+		AfxMessageBox(stringTableValue);
 		fileAgentSocket = INVALID_SOCKET;
 		return;
 	}
-	AfxMessageBox(TEXT("서버와의 연결에 성공하였습니다."));
+	stringTableValue.LoadStringW(FILE_CLIENT_CONNECT_SUCCESS);
+	AfxMessageBox(stringTableValue);
 
 	perHandleData = (LPPER_HANDLE_DATA)malloc(sizeof(PER_HANDLE_DATA));
 	perHandleData->hClntSock = fileAgentSocket;

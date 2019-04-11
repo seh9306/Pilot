@@ -186,6 +186,7 @@ void CFileAgentView::SetItemCountEx(int count)
 		fileCListCtrl.SetItemCountEx(count);
 	}
 }
+
 // CFileAgentView 메시지 처리기
 int CFileAgentView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
@@ -193,29 +194,50 @@ int CFileAgentView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 	
 	fileCListCtrl.Create(WS_BORDER | WS_VISIBLE | LVS_OWNERDATA | LVS_REPORT | LVS_EDITLABELS, CRect(30, 30, 180, 180), this, FILECLISTCTRL_ID);
-	fileCListCtrl.InsertColumn(0, TEXT("이름"), LVCF_TEXT, 150);
-	fileCListCtrl.InsertColumn(1, TEXT("수정한 날짜"), LVCF_TEXT, 130);
-	fileCListCtrl.InsertColumn(1, TEXT("만든 날짜"), LVCF_TEXT, 130);
-	fileCListCtrl.InsertColumn(1, TEXT("유형"), LVCF_TEXT, 130);
-	/*fileCListCtrl.SetExtendedStyle(fileCListCtrl.GetExtendedStyle() | LVS_EX_FULLROWSELECT);*/
+	
+	// setting column name
+	stringTableValue.LoadStringW(FILE_CLIENT_COLUMN_NAME);
+	fileCListCtrl.InsertColumn(0, stringTableValue, LVCF_TEXT, 150);
 
-	iPAddresscStatic.Create(TEXT("IP"), WS_VISIBLE, CRect(0, 0, 30, 20), this, IPADDRESSCEDIT_ID);
+	stringTableValue.LoadStringW(FILE_CLIENT_COLUMN_FIXED_DATE);
+	fileCListCtrl.InsertColumn(1, stringTableValue, LVCF_TEXT, 130);
+
+	stringTableValue.LoadStringW(FILE_CLIENT_COLUMN_MADE_DATE);
+	fileCListCtrl.InsertColumn(2, stringTableValue, LVCF_TEXT, 130);
+
+	stringTableValue.LoadStringW(FILE_CLIENT_COLUMN_ATTRIBUTE);
+	fileCListCtrl.InsertColumn(3, stringTableValue, LVCF_TEXT, 130);
+
+	stringTableValue.LoadStringW(FILE_CLIENT_IP_LABEL);
+	iPAddresscStatic.Create(stringTableValue, WS_VISIBLE, CRect(0, 0, 30, 20), this, IPADDRESSCEDIT_ID);
 	iPAddressCEdit.Create(WS_BORDER | WS_VISIBLE, CRect(30, 0, 150, 20), this, IPADDRESSSTATIC_ID);
 
-	portStatic.Create(TEXT("PORT"), WS_VISIBLE, CRect(150, 0, 200, 20), this, PORTSTATIC_ID);
+	stringTableValue.LoadStringW(FILE_CLIENT_PORT_LABEL);
+	portStatic.Create(stringTableValue, WS_VISIBLE, CRect(150, 0, 200, 20), this, PORTSTATIC_ID);
 	portCEdit.Create(WS_BORDER | WS_VISIBLE, CRect(205, 0, 255, 20), this, PORTCEDIT_ID);
 
-	connectBtn.Create(TEXT("접속"), WS_VISIBLE, CRect(255, 0, 300, 20), this, CONNECTBTN_ID);
-
-	dirStatic.Create(TEXT("DIR"), WS_VISIBLE, CRect(310, 0, 340, 20), this, DIRSTATIC_ID);
+	stringTableValue.LoadStringW(FILE_CLIENT_DIR_LABEL);
+	dirStatic.Create(stringTableValue, WS_VISIBLE, CRect(310, 0, 340, 20), this, DIRSTATIC_ID);
 	dirCEdit.Create(WS_BORDER | WS_VISIBLE, CRect(340, 0, 1000, 20), this, DIRCEDIT_ID);
 
-	iPAddressCEdit.SetWindowTextW(TEXT("127.0.0.1"));
-	portCEdit.SetWindowTextW(TEXT("9030"));
-	dirCEdit.SetWindowTextW(TEXT("C:\\"));
-	//dirCEdit.SetWindowTextW(TEXT("C:\\Windows\\WinSxS\\"));
+	// setting ip
+	stringTableValue.LoadStringW(FILE_CLIENT_DEFAULT_IP);
+	iPAddressCEdit.SetWindowTextW(stringTableValue);
 
-	exploreBtn.Create(TEXT("탐색"), WS_VISIBLE, CRect(1000, 0, 1050, 20), this, EXPLOREBTN_ID);
+	// setting port
+	stringTableValue.LoadStringW(FILE_CLIENT_DEFAULT_PORT);
+	portCEdit.SetWindowTextW(stringTableValue);
+
+	// setting dir
+	stringTableValue.LoadStringW(FILE_CLIENT_DEFAULT_DIR);
+	dirCEdit.SetWindowTextW(stringTableValue);
+
+	// setting button
+	stringTableValue.LoadStringW(FILE_CLIENT_CONNECT_BUTTON);
+	connectBtn.Create(stringTableValue, WS_VISIBLE, CRect(255, 0, 300, 20), this, CONNECTBTN_ID);
+
+	stringTableValue.LoadStringW(FILE_CLIENT_EXPLORE_BUTTON);
+	exploreBtn.Create(stringTableValue, WS_VISIBLE, CRect(1000, 0, 1050, 20), this, EXPLOREBTN_ID);
 
 	return 0;
 }
@@ -249,7 +271,8 @@ afx_msg void CFileAgentView::OnExploreBtnClicked()
 	FileAgentSocket *fileAgentSocket = FileAgentSocket::GetInstance();
 	if (fileAgentSocket->GetSocket() == INVALID_SOCKET)
 	{
-		AfxMessageBox(TEXT("서버와 연결되어 있지 않습니다."));
+		stringTableValue.LoadStringW(FILE_CLIENT_CONNECT_FAIL);
+		AfxMessageBox(stringTableValue);
 		return;
 	}
 	fileAgentSocket->UnSubscribe(pCharDir);
@@ -277,7 +300,7 @@ void CFileAgentView::OnItemDblclked(NMHDR * pNMHDR, LRESULT * pResult)
 	CString attr;
 	sIndexValue = fileCListCtrl.GetItemText(itemid, 0);
 	attr = fileCListCtrl.GetItemText(itemid, 3);
-	std::wcout << (const wchar_t*)sIndexValue << std::endl;
+	
 	if ((DWORD)_ttoi((LPCTSTR)attr) & FILE_ATTRIBUTE_DIRECTORY && sIndexValue != CString("."))
 	{
 		FileAgentSocket *fileAgentSocket = FileAgentSocket::GetInstance();
@@ -298,7 +321,6 @@ void CFileAgentView::OnItemDblclked(NMHDR * pNMHDR, LRESULT * pResult)
 				return;
 			}
 			dir = dir.Left(i+1);
-			std::wcout << (const wchar_t*)dir << std::endl;
 		}
 		else
 		{
@@ -363,9 +385,6 @@ void CFileAgentView::OnEndLabelEdit(NMHDR * pNMHDR, LRESULT * pResult)
 	strcpy_s(pFileOldName, CT2A(fileCListCtrl.GetItemText(pDispInfo->item.iItem, 0)));
 	strcpy_s(pFileNewName, CT2A(str));
 
-	std::wcout << (const wchar_t *)str << std::endl;
-	std::wcout << (const wchar_t *)fileCListCtrl.GetItemText(pDispInfo->item.iItem,0) << std::endl;
-
 	FileAgentSocket *fileAgentSocket = FileAgentSocket::GetInstance();
 	fileAgentSocket->Rename(pCharDir, pFileOldName, pFileNewName);
 
@@ -374,43 +393,7 @@ void CFileAgentView::OnEndLabelEdit(NMHDR * pNMHDR, LRESULT * pResult)
 
 LRESULT CFileAgentView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
-	//AfxMessageBox(message);
-	if (message == 27001) // FD_CONNECT 
-	{
-		if (WSAGETSELECTERROR(lParam) == 0) 
-		{ // 에러가 없다면 => 접속 성공을 의미
-			//WSAAsyncSelect(fa_socket, m_hWnd, 27002, FD_READ | FD_CLOSE);
-			dirCEdit.GetWindowTextW(dir);
-			strcpy_s(pCharDir, CT2A(dir));
-
-			//FileAgentSocket::GetInstance().Subscribe(pCharDir, *this);
-
-		}
-		else 
-		{ 
-			/*closesocket(fa_socket);
-			fa_socket = INVALID_SOCKET;
-			AddItem(TEXT("서버에 접속할 수 없습니다!"));*/
-		}
-	}
-	else if( message == 27002)
-	{
-		if (WSAGETSELECTEVENT(lParam) == FD_READ) 
-		{
-			//AddItem(TEXT("전달"));
-		}
-		else if (WSAGETSELECTEVENT(lParam))
-		{
-			//AddItem(TEXT("서버와의 연결 해제"));
-		}
-		
-	}
-	else if ( message == 20000)
-	{
-		std::cout << "??" << lParam << std::endl;
-		std::cout << (char *)wParam << std::endl;
-		//fileCListCtrl.SetItemText(lParam, 0, TEXT("!!!"));
-	}
+	// @issue
 
 	return CView::WindowProc(message, wParam, lParam);
 }
@@ -446,40 +429,34 @@ void makeTime(char *buf, FILETIME& fileTime)
 void CFileAgentView::OnLvnGetdispinfoList(NMHDR * pNMHDR, LRESULT * pResult)
 {
 	LV_DISPINFO* pDispInfo = (LV_DISPINFO*)pNMHDR;
-
-	//Create a pointer to the item
 	LV_ITEM* pItem = &(pDispInfo)->item;
 
-	//Which item number?
 	int itemid = pItem->iItem;
 
-	//Do the list need text information?
 	if (pItem->mask & LVIF_TEXT)
 	{
 		CString text;
 		
-		//Which column?
-		if (pItem->iSubItem == 0)
+		if (pItem->iSubItem == nameColumnPos)
 		{
 			//Text is name
-			//std::wcout << (const wchar_t *)files[itemid].cFileName << std::endl;
 			text = CString(files[itemid].cFileName);
 		}
-		else if (pItem->iSubItem == 1)
+		else if (pItem->iSubItem == fixedDateColumnPos)
 		{
 			//Text is slogan
 			char buffer[100];
 			makeTime(buffer, files[itemid].ftLastWriteTime);
 			text = CString(buffer);
 		}
-		else if (pItem->iSubItem == 2)
+		else if (pItem->iSubItem == madeDateColumnPos)
 		{
 			//Text is slogan
 			char buffer[100];
 			makeTime(buffer, files[itemid].ftCreationTime);
 			text = CString(buffer);
 		}
-		else if (pItem->iSubItem == 3)
+		else if (pItem->iSubItem == attributeDateColumnPos)
 		{
 			//Text is slogan
 			files[itemid].dwFileAttributes;
