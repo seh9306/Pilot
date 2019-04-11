@@ -66,6 +66,8 @@ void RenameProcessor::PacketProcess(SOCKET sock, char * msg)
 	byteOffset += oldFileLength + sizeof(int);
 	char* pNewFile = msg + byteOffset;
 
+	std::cout << "tetettetessssS" << pNewFile << std::endl;
+
 	cFileAgentView->RenameItem(pOldFile, pNewFile);
 	cFileAgentView->SetItemCountEx(cFileAgentView->GetListSize());
 	cFileAgentView->RedrawWindow();

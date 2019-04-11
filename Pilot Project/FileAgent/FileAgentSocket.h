@@ -14,7 +14,8 @@ public:
 	virtual ~FileAgentSocket();
 	static FileAgentSocket* GetInstance();
 	static void releaseInstance();
-	SOCKET GetSocket();
+	SOCKET& GetSocket();
+	void CloseSocket();
 	void Connect(char *ip, int port);
 	void Subscribe(char* dir);
 	void UnSubscribe(char* dir);

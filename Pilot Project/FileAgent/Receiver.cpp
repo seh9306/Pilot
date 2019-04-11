@@ -2,7 +2,7 @@
 
 #include "Receiver.h"
 #include "PacketProcessor.h"
-
+#include "FileAgentSocket.h"
 #include <iostream>
 
 void Receiver::operator()(HANDLE pComPort, std::vector<PacketProcessor *> &packetProcessors)
@@ -19,8 +19,13 @@ void Receiver::operator()(HANDLE pComPort, std::vector<PacketProcessor *> &packe
 
 		if (bytesTransferred == 0)
 		{
-			std::cout << "나가셨습니다" << std::endl;
-			closesocket(perHandleData->hClntSock);
+			// @issue make socket INVALID_SOCKET
+			FileAgentSocket* fileAgentSocket = FileAgentSocket::GetInstance();
+			if (fileAgentSocket)
+			{
+				fileAgentSocket->CloseSocket();
+			}
+			//closesocket(perHandleData->hClntSock);
 			free(perHandleData);
 			free(perIoData);
 			continue;

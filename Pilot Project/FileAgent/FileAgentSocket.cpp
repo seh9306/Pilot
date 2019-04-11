@@ -18,7 +18,7 @@ FileAgentSocket *FileAgentSocket::fileAgent = nullptr;
 FileAgentSocket::FileAgentSocket() 
 {
 	WSAStartup(0x0202, &wsaData);
-	fileAgentSocket = socket(AF_INET, SOCK_STREAM, 0);
+	fileAgentSocket = INVALID_SOCKET;//socket(AF_INET, SOCK_STREAM, 0);
 	dataBuf.len = 0;
 
 	// Create IO CompletionPort
@@ -66,9 +66,15 @@ void FileAgentSocket::releaseInstance()
 	}
 }
 
-SOCKET FileAgentSocket::GetSocket()
+SOCKET& FileAgentSocket::GetSocket()
 {
 	return fileAgentSocket;
+}
+
+void FileAgentSocket::CloseSocket()
+{
+	closesocket(fileAgentSocket);
+	fileAgentSocket = INVALID_SOCKET;
 }
 
 void FileAgentSocket::Connect(char *ipAddress, int port)
@@ -82,7 +88,7 @@ void FileAgentSocket::Connect(char *ipAddress, int port)
 	else
 	{
 		cleanSocket = true;
-		TRACE(TEXT("새로운 소켓을 개방하지 않음"));
+		fileAgentSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
 	}
 	
 	srv_addr.sin_family = AF_INET;
@@ -94,7 +100,30 @@ void FileAgentSocket::Connect(char *ipAddress, int port)
 	std::thread IOCPThread(receiver, hCompletionPort, packetProcessors);
 	IOCPThread.detach();
 
-	connect(fileAgentSocket, (sockaddr *)&srv_addr, sizeof(srv_addr));
+	/*bool connecting = true;
+	std::thread t([&](sockaddr_in* srv_addr)
+	{
+		connect(fileAgentSocket, (sockaddr *)&srv_addr, sizeof(srv_addr));
+		connecting = false;
+	}, srv_addr);
+
+	while (connecting)
+	{
+		MSG msg = { 0, };
+		while (connecting && PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+		Sleep(10);
+	}*/
+
+	if (connect(fileAgentSocket, (sockaddr *)&srv_addr, sizeof(srv_addr)) == -1) {
+		AfxMessageBox(TEXT("서버와의 연결에 실패하였습니다."));
+		fileAgentSocket = INVALID_SOCKET;
+		return;
+	}
+	AfxMessageBox(TEXT("서버와의 연결에 성공하였습니다."));
 
 	perHandleData = (LPPER_HANDLE_DATA)malloc(sizeof(PER_HANDLE_DATA));
 	perHandleData->hClntSock = fileAgentSocket;
