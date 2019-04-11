@@ -33,7 +33,11 @@ BEGIN_MESSAGE_MAP(CFileAgentView, CView)
 	ON_NOTIFY(NM_DBLCLK, FILECLISTCTRL_ID, &CFileAgentView::OnItemDblclked)
 	ON_NOTIFY(LVN_KEYDOWN, FILECLISTCTRL_ID, &CFileAgentView::OnListKeyDown)
 	ON_NOTIFY(LVN_ENDLABELEDIT, FILECLISTCTRL_ID, &CFileAgentView::OnEndLabelEdit)
+	ON_NOTIFY(LVN_BEGINDRAG, FILECLISTCTRL_ID, &CFileAgentView::OnBeginDrag)
 	ON_WM_CREATE()
+	ON_WM_MOUSEMOVE()
+	ON_WM_LBUTTONUP()
+	ON_WM_KEYDOWN()
 	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
@@ -194,7 +198,7 @@ int CFileAgentView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CView::OnCreate(lpCreateStruct) == -1)
 		return -1;
 	
-	fileCListCtrl.Create(WS_BORDER | WS_VISIBLE | LVS_OWNERDATA | LVS_REPORT | LVS_EDITLABELS | LVS_ICON, CRect(30, 30, 180, 180), this, FILECLISTCTRL_ID);
+	fileCListCtrl.Create( WS_VISIBLE | LVS_OWNERDATA | LVS_REPORT | LVS_EDITLABELS | LVS_ICON, CRect(30, 30, 180, 180), this, FILECLISTCTRL_ID);
 	
 	// setting column name
 	stringTableValue.LoadStringW(FILE_CLIENT_COLUMN_NAME);
@@ -362,6 +366,144 @@ void CFileAgentView::RenameFileRequest()
 	int nItem = fileCListCtrl.GetNextSelectedItem(pos);
 
 	fileCListCtrl.EditLabel(nItem);
+}
+
+void CFileAgentView::OnBeginDrag(NMHDR * pNMHDR, LRESULT * pResult)
+{
+	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
+
+	*pResult = 0;
+
+	if (0 >= fileCListCtrl.GetSelectedCount())
+	{
+		return;
+	}
+	nSource = pNMLV->iItem;
+
+	POINT ptImg;
+
+	pDragImage = fileCListCtrl.CreateDragImage(nSource, &ptImg);
+
+	if (pDragImage == nullptr)
+	{
+		return;
+	}
+
+	//핫스팟
+
+	CPoint ptSpot;
+
+	ptSpot.x = pNMLV->ptAction.x - ptImg.x;
+	ptSpot.y = pNMLV->ptAction.y - ptImg.y;
+	pDragImage->BeginDrag(0, ptSpot);
+
+	ptImg.x = pNMLV->ptAction.x;
+	ptImg.y = pNMLV->ptAction.y;
+
+	ClientToScreen(&ptImg);
+
+	pDragImage->DragEnter(NULL, ptImg);
+
+	nOldTarget = nSource;
+
+	bDrag = true;
+
+	SetCapture();
+
+}
+
+int CFileAgentView::GetHitIndex(CPoint point)
+{
+	CRect rcList;
+
+	fileCListCtrl.GetWindowRect(&rcList);
+	ScreenToClient(reinterpret_cast<LPPOINT>(&rcList));
+
+	LVHITTESTINFO HitInfo;
+
+	HitInfo.pt.x = point.x - rcList.left;
+	HitInfo.pt.y = point.y - rcList.top;
+
+	return fileCListCtrl.HitTest(&HitInfo);
+}
+
+void CFileAgentView::OnMouseMove(UINT nFlags, CPoint point)
+{
+	if (bDrag)
+	{
+		if (pDragImage == nullptr)
+		{
+			return;
+		}
+
+		// 드래그이미지이동
+		CPoint ptCursor(point);
+
+		ClientToScreen(&ptCursor);
+		pDragImage->DragMove(ptCursor);
+
+		int nTarget = GetHitIndex(point);
+
+		if (nTarget != -1)
+		{
+			pDragImage->DragLeave(NULL);
+			fileCListCtrl.SetItemState(nTarget, LVIS_DROPHILITED, LVIS_DROPHILITED);
+
+			if (nTarget != nOldTarget)
+			{
+				fileCListCtrl.SetItemState(nOldTarget, 0, LVIS_DROPHILITED);
+				nOldTarget = nTarget;
+				fileCListCtrl.UpdateWindow();
+			}
+
+			pDragImage->DragEnter(NULL, ptCursor);
+		}
+	}
+	CView::OnMouseMove(nFlags, point);
+
+}
+
+void CFileAgentView::OnLButtonUp(UINT nFlags, CPoint point)
+{
+	if (bDrag)
+	{
+		if (pDragImage == nullptr)
+		{
+			return;
+		}
+		fileCListCtrl.SetItemState(nOldTarget, 0, LVIS_DROPHILITED);
+
+		//드래그종료   
+		pDragImage->DragLeave(NULL);
+		ReleaseCapture();
+		pDragImage->EndDrag();
+
+		bDrag = false;
+		delete pDragImage;
+		pDragImage = nullptr;
+
+		int nDest = GetHitIndex(point);
+		if (nDest != -1) {
+			// TODO
+		}
+	}
+
+	CView::OnLButtonUp(nFlags, point);
+}
+
+void CFileAgentView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+	if (nChar == VK_ESCAPE)
+	{
+		fileCListCtrl.SetItemState(nOldTarget, 0, LVIS_DROPHILITED);
+		pDragImage->DragLeave(NULL);
+		ReleaseCapture();
+		pDragImage->EndDrag();
+
+		bDrag = false;
+		delete pDragImage;
+		pDragImage = nullptr;
+	}
 }
 
 void CFileAgentView::OnListKeyDown(NMHDR * pNMHDR, LRESULT * pResult)

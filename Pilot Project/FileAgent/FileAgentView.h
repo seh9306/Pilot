@@ -47,6 +47,23 @@ protected: // serialization에서만 만들어집니다.
 
 // 특성입니다.
 public:
+	CListCtrl fileCListCtrl;
+	CImageList imgList;
+	CImageList *pDragImage;
+
+	CEdit iPAddressCEdit;
+	CEdit portCEdit;
+	CEdit dirCEdit;
+
+	CStatic iPAddresscStatic;
+	CStatic portStatic;
+	CStatic dirStatic;
+
+	CButton connectBtn;
+	CButton exploreBtn;
+
+// 작업입니다.
+public:
 	CFileAgentDoc* GetDocument() const;
 	void AddItem(WIN32_FIND_DATA& file);
 	void DeleteItem(char * fileName);
@@ -58,23 +75,6 @@ public:
 	DWORD GenerateShowNumber();
 	DWORD GetShowNumber();
 	void SetItemCountEx(int count = -1);
-	
-	CListCtrl fileCListCtrl;
-	CImageList imgList;
-	
-	CEdit iPAddressCEdit;
-	CEdit portCEdit;
-	CEdit dirCEdit;
-
-	CStatic iPAddresscStatic;
-	CStatic portStatic;
-	CStatic dirStatic;
-
-	CButton connectBtn;
-	CButton exploreBtn;
-// 작업입니다.
-public:
-
 // 재정의입니다.
 public:
 	virtual void OnDraw(CDC* pDC);  // 이 뷰를 그리기 위해 재정의되었습니다.
@@ -104,12 +104,21 @@ public:
 	afx_msg void OnItemDblclked(NMHDR* pNMHDR, LRESULT* pResult);
 	void DeleteFileRequest();
 	void RenameFileRequest();
+	afx_msg void OnBeginDrag(NMHDR* pNMHDR, LRESULT* pResult);
+	int GetHitIndex(CPoint point);
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnListKeyDown(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnEndLabelEdit(NMHDR * pNMHDR, LRESULT * pResult);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnLvnGetdispinfoList(NMHDR *pNMHDR, LRESULT *pResult);
 
 private:
+	bool        bDrag;        
+	int         nOldTarget;   
+	int         nSource;      
+
 	int listSize = 0;
 	DWORD showNumber = 0;
 	
