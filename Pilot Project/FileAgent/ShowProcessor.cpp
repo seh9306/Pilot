@@ -33,8 +33,6 @@ ShowProcessor::~ShowProcessor()
 
 void ShowProcessor::PacketProcess(SOCKET sock, char *msg)
 {
-	TRACE(TEXT("Show Processor"));
-	
 	int offset = 0;
 
 	offset += PROTOCOL_TYPE_SIZE;

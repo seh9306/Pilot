@@ -60,6 +60,7 @@ public:
 	void SetItemCountEx(int count = -1);
 	
 	CListCtrl fileCListCtrl;
+	CImageList imgList;
 	
 	CEdit iPAddressCEdit;
 	CEdit portCEdit;
@@ -107,6 +108,7 @@ public:
 	afx_msg void OnEndLabelEdit(NMHDR * pNMHDR, LRESULT * pResult);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnLvnGetdispinfoList(NMHDR *pNMHDR, LRESULT *pResult);
+
 private:
 	int listSize = 0;
 	DWORD showNumber = 0;

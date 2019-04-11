@@ -146,5 +146,11 @@
     <Image Include="res\Toolbar.bmp">
       <Filter>리소스 파일</Filter>
     </Image>
+    <Image Include="res\directory.ico">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\paper.ico">
+      <Filter>리소스 파일</Filter>
+    </Image>
   </ItemGroup>
 </Project>

@@ -230,11 +230,18 @@
     <None Include="res\FileAgent.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\directory.ico" />
     <Image Include="res\FileAgent.ico" />
     <Image Include="res\FileAgentDoc.ico" />
+    <Image Include="res\paper.ico" />
     <Image Include="res\Toolbar.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="FileAgent.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>

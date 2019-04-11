@@ -13,6 +13,7 @@
 #include "FileAgentView.h"
 #include "FileAgentSocket.h"
 
+#include "resource.h"  
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -193,7 +194,7 @@ int CFileAgentView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CView::OnCreate(lpCreateStruct) == -1)
 		return -1;
 	
-	fileCListCtrl.Create(WS_BORDER | WS_VISIBLE | LVS_OWNERDATA | LVS_REPORT | LVS_EDITLABELS, CRect(30, 30, 180, 180), this, FILECLISTCTRL_ID);
+	fileCListCtrl.Create(WS_BORDER | WS_VISIBLE | LVS_OWNERDATA | LVS_REPORT | LVS_EDITLABELS | LVS_ICON, CRect(30, 30, 180, 180), this, FILECLISTCTRL_ID);
 	
 	// setting column name
 	stringTableValue.LoadStringW(FILE_CLIENT_COLUMN_NAME);
@@ -207,6 +208,11 @@ int CFileAgentView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	stringTableValue.LoadStringW(FILE_CLIENT_COLUMN_ATTRIBUTE);
 	fileCListCtrl.InsertColumn(3, stringTableValue, LVCF_TEXT, 130);
+
+	imgList.Create(16, 16, ILC_COLOR32, 2, 0);
+	imgList.Add(AfxGetApp()->LoadIconW(IDI_ICON1));
+	imgList.Add(AfxGetApp()->LoadIconW(IDI_ICON2));
+	fileCListCtrl.SetImageList(&imgList, LVSIL_SMALL);
 
 	stringTableValue.LoadStringW(FILE_CLIENT_IP_LABEL);
 	iPAddresscStatic.Create(stringTableValue, WS_VISIBLE, CRect(0, 0, 30, 20), this, IPADDRESSCEDIT_ID);
@@ -436,7 +442,7 @@ void CFileAgentView::OnLvnGetdispinfoList(NMHDR * pNMHDR, LRESULT * pResult)
 	if (pItem->mask & LVIF_TEXT)
 	{
 		CString text;
-		
+
 		if (pItem->iSubItem == nameColumnPos)
 		{
 			//Text is name
@@ -459,13 +465,24 @@ void CFileAgentView::OnLvnGetdispinfoList(NMHDR * pNMHDR, LRESULT * pResult)
 		else if (pItem->iSubItem == attributeDateColumnPos)
 		{
 			//Text is slogan
-			files[itemid].dwFileAttributes;
-			text.Format(TEXT("%u"),files[itemid].dwFileAttributes);
-			
+			text.Format(TEXT("%u"), files[itemid].dwFileAttributes);
+
 		}
 
 		//Copy the text to the LV_ITEM structure
 		//Maximum number of characters is in pItem->cchTextMax
 		lstrcpyn(pItem->pszText, text, pItem->cchTextMax);
+	}
+	if (pItem->mask & LVIF_IMAGE)
+	{
+		if (files[itemid].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+		{
+			pItem->iImage = 0;
+		}
+		else
+		{
+			pItem->iImage = 1;
+		}
+		
 	}
 }
