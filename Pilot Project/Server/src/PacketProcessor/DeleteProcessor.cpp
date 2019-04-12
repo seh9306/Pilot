@@ -56,7 +56,8 @@ void DeleteProcessor::PacketProcess(SOCKET sock, char* msg)
 
 	std::list<SOCKET>* sockets = subscribeManager.GetSocketsByDir(pDir);
 
-	std::cout << sockets->size() << "size size size " << std::endl; 
-
-	publishManager.Publish(msg, *sockets, PROTOCOL_TYPE_SIZE + FILE_TYPE_SIZE + sizeof(int) + dirLength + sizeof(int) + fileNameLength);
+	if (sockets != nullptr)
+	{
+		publishManager.Publish(msg, *sockets, PROTOCOL_TYPE_SIZE + FILE_TYPE_SIZE + sizeof(int) + dirLength + sizeof(int) + fileNameLength);
+	}
 }

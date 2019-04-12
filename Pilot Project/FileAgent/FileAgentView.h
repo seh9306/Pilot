@@ -74,6 +74,7 @@ public:
 	void SetListSize(int listSize);
 	DWORD GenerateShowNumber();
 	DWORD GetShowNumber();
+	char* GetPCharDir();
 	void SetItemCountEx(int count = -1);
 // 재정의입니다.
 public:
@@ -115,9 +116,9 @@ public:
 	afx_msg void OnLvnGetdispinfoList(NMHDR *pNMHDR, LRESULT *pResult);
 
 private:
-	bool        bDrag;        
-	int         nOldTarget;   
-	int         nSource;      
+	bool        bDrag = false;        
+	int         nOldTarget = -1;   
+	int         nSource = -1;      
 
 	int listSize = 0;
 	DWORD showNumber = 0;
@@ -138,6 +139,7 @@ private:
 	char pFileName[MAX_PATH];
 	char pFileOldName[MAX_PATH];
 	char pFileNewName[MAX_PATH];
+	char pGoalDir[MAX_PATH];
 
 	char buffer[1024];
 	

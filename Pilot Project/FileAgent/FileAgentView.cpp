@@ -41,6 +41,8 @@ BEGIN_MESSAGE_MAP(CFileAgentView, CView)
 	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
+void makeTime(char *buf, FILETIME& fileTime);
+
 // CFileAgentView 생성/소멸
 
 CFileAgentView::CFileAgentView() noexcept
@@ -178,6 +180,11 @@ DWORD CFileAgentView::GenerateShowNumber()
 DWORD CFileAgentView::GetShowNumber()
 {
 	return showNumber;
+}
+
+char* CFileAgentView::GetPCharDir()
+{
+	return pCharDir;
 }
 
 void CFileAgentView::SetItemCountEx(int count)
@@ -343,8 +350,7 @@ void CFileAgentView::OnItemDblclked(NMHDR * pNMHDR, LRESULT * pResult)
 	}
 }
 
-// key down
-// select menu
+// #delete file
 void CFileAgentView::DeleteFileRequest()
 {
 	POSITION pos = fileCListCtrl.GetFirstSelectedItemPosition();
@@ -358,8 +364,7 @@ void CFileAgentView::DeleteFileRequest()
 	fileAgentSocket->Delete(pCharDir, pFileName, attribute);
 }
 
-// key down
-// select menu
+// #rename file
 void CFileAgentView::RenameFileRequest()
 {
 	POSITION pos = fileCListCtrl.GetFirstSelectedItemPosition();
@@ -389,8 +394,7 @@ void CFileAgentView::OnBeginDrag(NMHDR * pNMHDR, LRESULT * pResult)
 		return;
 	}
 
-	//핫스팟
-
+	// standard point of image 
 	CPoint ptSpot;
 
 	ptSpot.x = pNMLV->ptAction.x - ptImg.x;
@@ -436,7 +440,7 @@ void CFileAgentView::OnMouseMove(UINT nFlags, CPoint point)
 			return;
 		}
 
-		// 드래그이미지이동
+		// move drag image
 		CPoint ptCursor(point);
 
 		ClientToScreen(&ptCursor);
@@ -473,7 +477,7 @@ void CFileAgentView::OnLButtonUp(UINT nFlags, CPoint point)
 		}
 		fileCListCtrl.SetItemState(nOldTarget, 0, LVIS_DROPHILITED);
 
-		//드래그종료   
+		// end drag   
 		pDragImage->DragLeave(NULL);
 		ReleaseCapture();
 		pDragImage->EndDrag();
@@ -484,7 +488,20 @@ void CFileAgentView::OnLButtonUp(UINT nFlags, CPoint point)
 
 		int nDest = GetHitIndex(point);
 		if (nDest != -1) {
-			// TODO
+			CString cAttribute = fileCListCtrl.GetItemText(nDest, attributeDateColumnPos);
+			DWORD Attribute = (DWORD)_ttoi((LPCTSTR)cAttribute);
+			// #move file
+			if (Attribute & FILE_ATTRIBUTE_DIRECTORY)
+			{
+				FileAgentSocket* fileAgentSocket = FileAgentSocket::GetInstance();
+
+				strcpy_s(pFileName, CT2A(fileCListCtrl.GetItemText(nSource, nameColumnPos)));
+				strcpy_s(pGoalDir, CT2A(fileCListCtrl.GetItemText(nDest, nameColumnPos)));
+				char tmp[300];
+				makeTime(tmp, files.at(nSource).ftCreationTime);
+				std::cout << "즈이발" << tmp << std::endl;
+				fileAgentSocket->Move(pCharDir, pFileName, pGoalDir, files.at(nSource));
+			}
 		}
 	}
 
@@ -493,7 +510,7 @@ void CFileAgentView::OnLButtonUp(UINT nFlags, CPoint point)
 
 void CFileAgentView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	if (nChar == VK_ESCAPE)
+	if (bDrag && nChar == VK_ESCAPE)
 	{
 		fileCListCtrl.SetItemState(nOldTarget, 0, LVIS_DROPHILITED);
 		pDragImage->DragLeave(NULL);

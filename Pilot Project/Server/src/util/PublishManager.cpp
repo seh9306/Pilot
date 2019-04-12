@@ -177,10 +177,6 @@ void PublishManager::sSubscribe(char * msg, SOCKET sock)
 	memcpy(wsaBuf.buf + PROTOCOL_TYPE_SIZE + 1, &dirLength, sizeof(int));
 	wsaBuf.len += sizeof(int);
 
-#ifdef PM_DEBUG
-	std::cout << "PM_DEBUG :: " << wsaBuf.buf + SUB_HEADER_SIZE + sizeof(int) << std::endl;
-#endif
-
 	if (WSASend(sock, &wsaBuf, 1,
 		&length, 0, NULL, NULL) == SOCKET_ERROR)
 	{

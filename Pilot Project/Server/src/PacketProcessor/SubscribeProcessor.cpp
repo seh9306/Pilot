@@ -44,8 +44,4 @@ void SubscribeProcessor::PacketProcess(SOCKET sock, char *msg)
 	{
 		publishManager.fSubscribe(msg + SUB_HEADER_SIZE, sock);
 	}
-
-	// publish to sub
-	//publishManager.Publish(msg, sock);
-
 }

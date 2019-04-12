@@ -46,8 +46,7 @@ std::list<WIN32_FIND_DATA>* FileManager::GetFileList(char *dir)
 
 	return files;
 }
-// @issue
-#include <iostream>
+
 bool FileManager::DeleteFileByFileName(char* dir, char* fileName, char type)
 {
 	char* temp = new char[strlen(dir) + strlen(fileName) + 1];
@@ -101,7 +100,7 @@ bool FileManager::Rename(char* dir, char* oldName, char* newName)
 
 	delete[] absOldPath;
 	delete[] absNewPath;
-	std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+	
 	if (result == -1)
 	{
 		return false;
@@ -111,4 +110,34 @@ bool FileManager::Rename(char* dir, char* oldName, char* newName)
 		return true;
 	}
 	
+}
+
+bool FileManager::Move(char* dir, char* fileName, char* newFileDir)
+{
+	char* absOldPath = new char[strlen(dir) + strlen(fileName) + 1];
+	char* absNewPath = new char[strlen(newFileDir) + strlen(fileName) + 2];
+
+	absOldPath[0] = 0;
+	absNewPath[0] = 0;
+
+	strcat(absOldPath, dir);
+	strcat(absOldPath, fileName);
+
+	strcat(absNewPath, newFileDir);
+	strcat(absNewPath, fileName);
+
+	int result = MoveFile(absOldPath, absNewPath);
+
+	delete[] absOldPath;
+	delete[] absNewPath;
+	
+	if (result == -1)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+
 }

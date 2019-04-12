@@ -12,7 +12,7 @@ typedef struct {
 
 typedef struct {
 	OVERLAPPED overlapped; // handle Event 이벤트 처리 할 수 있는 구조체?
-	char buffer[BUFSIZE];
+	char buffer[BUFSIZE + 1];
 	WSABUF wsaBuf; // buffer length, buffer
 } PER_IO_DATA, *LPPER_IO_DATA;
 

@@ -61,8 +61,7 @@ void DeleteProcessor::PacketProcess(SOCKET sock, char* msg)
 	}
 
 	char* pFile = msg + PROTOCOL_TYPE_SIZE + FILE_TYPE_SIZE + sizeof(int) + dirLength + sizeof(int);
-	static int i = 0;
-	std::cout << "delete call " << i++ << pFile<< std::endl;
+
 	cFileAgentView->DeleteItem(pFile);
 	cFileAgentView->SetListSize(cFileAgentView->GetListSize()-1);
 	cFileAgentView->SetItemCountEx();

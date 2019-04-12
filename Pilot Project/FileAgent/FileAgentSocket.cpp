@@ -323,3 +323,59 @@ void FileAgentSocket::Rename(char* dir, char* oldName, char* newName)
 	std::cout << "전송" << std::endl;
 }
 
+void FileAgentSocket::Move(char* dir, char* fileName, char* goal, WIN32_FIND_DATA& file)
+{
+	std::cout << "dir : " << dir << std::endl;
+	std::cout << "fileName : " << fileName << std::endl;
+	std::cout << "goal : " << goal << std::endl;
+
+	dataBuf.buf = buffer;
+
+	dataBuf.buf[0] = kMove;
+	dataBuf.len = 0 + PROTOCOL_TYPE_SIZE;
+
+	// dir
+	int length = strlen(dir) + NULL_VALUE_SIZE;
+
+	memcpy(dataBuf.buf + dataBuf.len, &length, sizeof(int));
+	dataBuf.len += sizeof(int);
+
+	memcpy(dataBuf.buf + dataBuf.len, dir, length);
+	dataBuf.len += length;
+
+	// fileName
+	length = strlen(fileName) + NULL_VALUE_SIZE;
+
+	memcpy(dataBuf.buf + dataBuf.len, &length, sizeof(int));
+	dataBuf.len += sizeof(int);
+
+	memcpy(dataBuf.buf + dataBuf.len, fileName, length);
+	dataBuf.len += length;
+
+	// goal
+	strcat(goal, "\\");
+	length = strlen(dir) + strlen(goal) + NULL_VALUE_SIZE;
+	std::cout << "길이" << length << std::endl;
+	memcpy(dataBuf.buf + dataBuf.len, &length, sizeof(int));
+	dataBuf.len += sizeof(int);
+	std::cout << "사이즈 마지막 문자열 시작" << dataBuf.len << std::endl;
+	memcpy(dataBuf.buf + dataBuf.len, dir, strlen(dir));
+	dataBuf.len += strlen(dir);
+	
+	memcpy(dataBuf.buf + dataBuf.len, goal, strlen(goal) + NULL_VALUE_SIZE);
+	dataBuf.len += strlen(goal) + NULL_VALUE_SIZE;
+	std::cout << "파일 시작 " << dataBuf.len << " 뭔데 "<< strlen(goal) << std::endl;
+	memcpy(dataBuf.buf + dataBuf.len, &file, WIN_FIND_DATA_FRONT_SIZE);
+	dataBuf.len += WIN_FIND_DATA_FRONT_SIZE;
+
+	std::cout << "사이즈 " << dataBuf.len << std::endl;
+
+	if (WSASend(fileAgentSocket, &dataBuf, 1, (LPDWORD)&sendBytes, 0, NULL, NULL) == SOCKET_ERROR)
+	{
+		if (WSAGetLastError() != WSA_IO_PENDING)
+		{
+			TRACE("error");
+		}
+	}
+}
+

@@ -3,6 +3,8 @@
 
 #include "PacketProcessor.h"
 
+class CFileAgentView;
+
 class MoveProcessor :
 	public PacketProcessor
 {
@@ -11,6 +13,8 @@ public:
 	~MoveProcessor();
 
 	void PacketProcess(SOCKET sock, char *msg);
+private:
+	CFileAgentView* cFileAgentView;
 };
 
 #endif

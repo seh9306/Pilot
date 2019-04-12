@@ -38,7 +38,7 @@ void RenameProcessor::PacketProcess(SOCKET sock, char * msg)
 		return;
 	}
 
-	// File delete
+	// File rename
 	FileManager& fileManager = FileManager::GetInstance();
 
 	byteOffset = 0 + PROTOCOL_TYPE_SIZE + sizeof(int);
@@ -61,5 +61,8 @@ void RenameProcessor::PacketProcess(SOCKET sock, char * msg)
 
 	std::list<SOCKET>* sockets = subscribeManager.GetSocketsByDir(pDir);
 
-	publishManager.Publish(msg, *sockets, RENAME_HEADER_SIZE + dirLength + oldFileLength + newFileLength);
+	if (sockets != nullptr)
+	{
+		publishManager.Publish(msg, *sockets, RENAME_HEADER_SIZE + dirLength + oldFileLength + newFileLength);
+	}
 }

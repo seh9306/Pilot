@@ -16,13 +16,14 @@ public:
 	static void releaseInstance();
 	SOCKET& GetSocket();
 	void CloseSocket();
-	void Connect(char *ip, int port);
+	void Connect(char* ip, int port);
 	void Subscribe(char* dir);
 	void UnSubscribe(char* dir);
-	void Show(char * dir, DWORD showNumber);
+	void Show(char* dir, DWORD showNumber);
 	void Update();
-	void Delete(char * dir, char * fileName, char attribute);
-	void Rename(char * dir, char * oldName, char * newName);
+	void Delete(char* dir, char* fileName, char attribute);
+	void Rename(char* dir, char* oldName, char* newName);
+	void Move(char* dir, char* fileName, char* goal, WIN32_FIND_DATA & file);
 private:
 	FileAgentSocket();
 	static FileAgentSocket* fileAgent;

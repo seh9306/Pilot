@@ -22,7 +22,7 @@ SubscribeManager& SubscribeManager::GetInstance()
 bool SubscribeManager::Subscribe(char *dir, SOCKET sock) 
 {
 	std::string dirString(dir);
-	
+	std::cout << dirString << "을 구독하셨습니다."<<std::endl;
 	auto search = sockets.find(dirString);
 
 	if (search != sockets.end()) 
