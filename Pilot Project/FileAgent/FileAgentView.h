@@ -36,6 +36,7 @@
 #define DIRSTATIC_ID 26007
 #define DIRCEDIT_ID 26008
 #define EXPLOREBTN_ID 26009
+#define FILECTREECTRL_ID 26010
 
 class CFileAgentDoc;
 
@@ -48,6 +49,7 @@ protected: // serialization에서만 만들어집니다.
 // 특성입니다.
 public:
 	CListCtrl fileCListCtrl;
+	CTreeCtrl fileCTreeCtrl;
 	CImageList imgList;
 	CImageList *pDragImage;
 

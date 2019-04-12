@@ -117,8 +117,6 @@ void CFileAgentView::AddItem(WIN32_FIND_DATA& file)
 {
 	files.push_back(file);
 }
-#include <iostream>
-
 
 void CFileAgentView::DeleteItem(char* fileName)
 {
@@ -205,8 +203,9 @@ int CFileAgentView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CView::OnCreate(lpCreateStruct) == -1)
 		return -1;
 	
-	fileCListCtrl.Create( WS_VISIBLE | LVS_OWNERDATA | LVS_REPORT | LVS_EDITLABELS | LVS_ICON, CRect(30, 30, 180, 180), this, FILECLISTCTRL_ID);
-	
+	fileCListCtrl.Create( WS_VISIBLE | WS_BORDER | LVS_OWNERDATA | LVS_REPORT | LVS_EDITLABELS | LVS_ICON, CRect(180, 30, 180, 180), this, FILECLISTCTRL_ID);
+	fileCTreeCtrl.Create(WS_VISIBLE | WS_BORDER, CRect(0, 30, 180, 180), this, FILECTREECTRL_ID);
+
 	// setting column name
 	stringTableValue.LoadStringW(FILE_CLIENT_COLUMN_NAME);
 	fileCListCtrl.InsertColumn(0, stringTableValue, LVCF_TEXT, 150);
@@ -497,9 +496,6 @@ void CFileAgentView::OnLButtonUp(UINT nFlags, CPoint point)
 
 				strcpy_s(pFileName, CT2A(fileCListCtrl.GetItemText(nSource, nameColumnPos)));
 				strcpy_s(pGoalDir, CT2A(fileCListCtrl.GetItemText(nDest, nameColumnPos)));
-				char tmp[300];
-				makeTime(tmp, files.at(nSource).ftCreationTime);
-				std::cout << "즈이발" << tmp << std::endl;
 				fileAgentSocket->Move(pCharDir, pFileName, pGoalDir, files.at(nSource));
 			}
 		}
@@ -572,12 +568,22 @@ void CFileAgentView::OnSize(UINT nType, int cx, int cy)
 	fileCListCtrl.GetWindowRect(&rectCtl);
 	ScreenToClient(&rectCtl);
 
-
 	fileCListCtrl.MoveWindow(
 		rectCtl.left,                               // x. remains unchanged
 		rectCtl.top,                                // y. remains unchanged
-		cx - 2 * rectCtl.left,            // w. Grow to fill horizontally
-		cy - rectCtl.top - rectCtl.left, // h. Grow to fill vertically
+		cx - rectCtl.left,            // w. Grow to fill horizontally
+		cy - rectCtl.top, // h. Grow to fill vertically
+		TRUE)
+		;
+	
+	fileCTreeCtrl.GetWindowRect(&rectCtl);
+	ScreenToClient(&rectCtl);
+
+	fileCTreeCtrl.MoveWindow(
+		rectCtl.left,                               // x. remains unchanged
+		rectCtl.top,                                // y. remains unchanged
+		rectCtl.right,            // w. Grow to fill horizontally
+		cy - rectCtl.top, // h. Grow to fill vertically
 		TRUE)
 		;
 }
