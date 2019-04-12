@@ -19,8 +19,10 @@ class Server
 {
 public:
 	Server();
+	~Server();
 	bool Init();
 	bool Start();
+	void clntInOut(int count);
 private:
 	int port;
 	WSADATA wsaData; // Window Socket API Data
@@ -34,6 +36,9 @@ private:
 	SOCKET hServSock; 
 	DWORD recvBytes;
 	DWORD flags;
+
+	int numberOfClient = 0;
+	CRITICAL_SECTION criticalSection;
 
 	// Create Processor vector
 	std::vector<PacketProcessor *> packetProcessors;

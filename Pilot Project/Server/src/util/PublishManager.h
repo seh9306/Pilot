@@ -11,7 +11,7 @@ public:
 	static PublishManager& GetInstance();
 	bool Publish(char *dir, SOCKET sock);
 	bool Publish(char * msg, std::list<SOCKET>& socks, int size);
-	void sSubscribe(char* msg, SOCKET sock);
+	void Publish(char* msg, SOCKET sock, int size);
 	void fSubscribe(char* dir, SOCKET sock);
 private:
 	PublishManager();

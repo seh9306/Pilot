@@ -2,15 +2,19 @@
 
 #include <iostream>
 
-// @issue
-#define SM_DEBUG
-
 SubscribeManager::SubscribeManager()
 {
 }
 
 SubscribeManager::~SubscribeManager()
 {
+	// @issue
+	auto it = sockets.begin();
+
+	for (; it != sockets.end(); it++)
+	{
+		delete it->second;
+	}
 }
 
 SubscribeManager& SubscribeManager::GetInstance() 
@@ -22,16 +26,17 @@ SubscribeManager& SubscribeManager::GetInstance()
 bool SubscribeManager::Subscribe(char *dir, SOCKET sock) 
 {
 	std::string dirString(dir);
-	std::cout << dirString << "을 구독하셨습니다."<<std::endl;
+	std::cout << "Subscribe " << dirString << std::endl;
 	auto search = sockets.find(dirString);
 
 	if (search != sockets.end()) 
 	{
 		search->second->push_back(sock);
-		std::cout << "구독자 수 : " << search->second->size() << std::endl;
+		std::cout << "Number of subscriber : " << search->second->size() << std::endl;
 	}
 	else 
 	{
+		// new operator
 		std::list<SOCKET> *temp = new std::list<SOCKET>();
 		temp->push_back(sock);
 		sockets.insert({ dirString, temp });

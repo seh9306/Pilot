@@ -211,6 +211,7 @@
     <ClCompile Include="FileAgentSocket.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="MoveProcessor.cpp" />
+    <ClCompile Include="PacketProcessor.cpp" />
     <ClCompile Include="Receiver.cpp" />
     <ClCompile Include="RenameProcessor.cpp" />
     <ClCompile Include="ShowProcessor.cpp" />
@@ -227,6 +228,7 @@
     <ResourceCompile Include="FileAgent.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram.cd" />
     <None Include="res\FileAgent.rc2" />
   </ItemGroup>
   <ItemGroup>

@@ -3,13 +3,13 @@
 #include "Util/SubscribeManager.h"
 #include "Receiver.h"
 
+
 #include <iostream>
 #include <string>
 
-void Receiver::operator()(HANDLE pComPort, std::vector<PacketProcessor *> &packetProcessors)
+void Receiver::operator()(Server* server, HANDLE pComPort, std::vector<PacketProcessor *> &packetProcessors)
 {
 	hCompletionPort = pComPort;
-	std::cout << id << std::endl;
 	SubscribeManager& subcribeManager = SubscribeManager::GetInstance();
 	while (true) 
 	{
@@ -23,9 +23,9 @@ void Receiver::operator()(HANDLE pComPort, std::vector<PacketProcessor *> &packe
 		if (bytesTransferred == 0)
 		{
 			std::string temp = subcribeManager.GetDirBySocket(perHandleData->hClntSock);
-			char *cstr = (char *)temp.c_str();
-			subcribeManager.UnSubscribe(cstr, perHandleData->hClntSock);
-			std::cout << "나가셨습니다" << std::endl;
+			subcribeManager.UnSubscribe((char *)temp.c_str(), perHandleData->hClntSock);
+			std::cout << "Out clnt";
+			server->clntInOut(-1);
 			closesocket(perHandleData->hClntSock);
 			free(perHandleData);
 			free(perIoData);

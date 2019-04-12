@@ -1,3 +1,11 @@
+#if defined(_DEBUG)
+#define _CRTDBG_MAP_ALLOC
+#define new new(_NORMAL_BLOCK, __FILE__, __LINE__)
+#endif
+
+#include <crtdbg.h>
+#include <cstdlib>
+
 
 #include "server/Server.h"
 
@@ -5,6 +13,10 @@ extern void error_handle(char *);
 
 int main(int argc, char *args) 
 {
+#if defined(DEBUG)
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
+
 	// create Server
 	Server server;
 	int code = 0;

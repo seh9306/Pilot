@@ -14,7 +14,6 @@ public:
 	virtual void PacketProcess(SOCKET sock, char *msg);
 private:
 	WSABUF dataBuf;
-	CFileAgentView* cFileAgentView;
 };
 
 #endif

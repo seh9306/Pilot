@@ -10,9 +10,6 @@ public:
 	ShowProcessor();
 	virtual ~ShowProcessor();
 	virtual void PacketProcess(SOCKET sock, char *msg);
-private:
-	WSABUF dataBuf;
-	CFileAgentView* cFileAgentView;
 };
 
 #endif

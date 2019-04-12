@@ -39,7 +39,17 @@ FileAgentSocket::FileAgentSocket()
 FileAgentSocket::~FileAgentSocket() 
 {
 	TRACE(TEXT("FileAgentSocket ¼Ò¸ê"));
-	
+	int size = packetProcessors.size();
+	for (int index = 0; index < size; index++)
+	{
+		PacketProcessor* packetProcessor = packetProcessors.at(index);
+		if (packetProcessor)
+		{
+			delete packetProcessor;
+		}
+	}
+	packetProcessors.clear();
+
 }
 
 // @issue

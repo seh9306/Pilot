@@ -108,6 +108,7 @@ public:
 	void DeleteFileRequest();
 	void RenameFileRequest();
 	afx_msg void OnBeginDrag(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg	void OnTvnSelChangedTree(NMHDR * pNMHDR, LRESULT * pResult);
 	int GetHitIndex(CPoint point);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);

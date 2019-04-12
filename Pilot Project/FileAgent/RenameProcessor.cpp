@@ -1,28 +1,11 @@
 #include "stdafx.h"
 
 #include "RenameProcessor.h"
-#include "MainFrm.h"
-#include "FileAgentView.h"
 
 #include <iostream>
 
 RenameProcessor::RenameProcessor()
 {
-	CMainFrame* cMainFrame = (CMainFrame*)(AfxGetApp()->GetMainWnd());
-	if (cMainFrame == nullptr)
-	{
-		TRACE(TEXT("get Main Frame failure"));
-	}
-	else
-	{
-		TRACE(TEXT("get Main Frame success"));
-	}
-
-	cFileAgentView = (CFileAgentView*)(cMainFrame->GetActiveView());
-	if (cFileAgentView == nullptr)
-	{
-		TRACE(TEXT("get list control failure"));
-	}
 }
 
 

@@ -34,6 +34,7 @@ BEGIN_MESSAGE_MAP(CFileAgentView, CView)
 	ON_NOTIFY(LVN_KEYDOWN, FILECLISTCTRL_ID, &CFileAgentView::OnListKeyDown)
 	ON_NOTIFY(LVN_ENDLABELEDIT, FILECLISTCTRL_ID, &CFileAgentView::OnEndLabelEdit)
 	ON_NOTIFY(LVN_BEGINDRAG, FILECLISTCTRL_ID, &CFileAgentView::OnBeginDrag)
+	ON_NOTIFY(TVN_SELCHANGED, FILECTREECTRL_ID, &CFileAgentView::OnBeginDrag)
 	ON_WM_CREATE()
 	ON_WM_MOUSEMOVE()
 	ON_WM_LBUTTONUP()
@@ -205,6 +206,23 @@ int CFileAgentView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	
 	fileCListCtrl.Create( WS_VISIBLE | WS_BORDER | LVS_OWNERDATA | LVS_REPORT | LVS_EDITLABELS | LVS_ICON, CRect(180, 30, 180, 180), this, FILECLISTCTRL_ID);
 	fileCTreeCtrl.Create(WS_VISIBLE | WS_BORDER, CRect(0, 30, 180, 180), this, FILECTREECTRL_ID);
+	
+	imgList.Create(16, 16, ILC_COLOR32, 2, 0);
+	imgList.Add(AfxGetApp()->LoadIconW(IDI_ICON1));
+	imgList.Add(AfxGetApp()->LoadIconW(IDI_ICON2));
+	fileCListCtrl.SetImageList(&imgList, LVSIL_SMALL);
+	fileCTreeCtrl.SetImageList(&imgList, LVSIL_NORMAL);
+
+	// @temp 
+	HTREEITEM hItem = nullptr;
+	hItem = fileCTreeCtrl.InsertItem(TEXT("바탕 화면"), 0, 0, TVI_ROOT);
+	hItem = fileCTreeCtrl.InsertItem(TEXT("내 문서"), 0, 5, hItem);
+	fileCTreeCtrl.InsertItem(TEXT("내 그림"), 2, 5, hItem);
+	fileCTreeCtrl.InsertItem(TEXT("내 비디오"), 3, 5, hItem);
+	hItem = fileCTreeCtrl.InsertItem(TEXT("Sample folder"), 4, 5, hItem);
+	hItem = fileCTreeCtrl.InsertItem(TEXT("Sub folder"), 4, 5, hItem);
+
+	fileCTreeCtrl.EnsureVisible(hItem);
 
 	// setting column name
 	stringTableValue.LoadStringW(FILE_CLIENT_COLUMN_NAME);
@@ -219,10 +237,6 @@ int CFileAgentView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	stringTableValue.LoadStringW(FILE_CLIENT_COLUMN_ATTRIBUTE);
 	fileCListCtrl.InsertColumn(3, stringTableValue, LVCF_TEXT, 130);
 
-	imgList.Create(16, 16, ILC_COLOR32, 2, 0);
-	imgList.Add(AfxGetApp()->LoadIconW(IDI_ICON1));
-	imgList.Add(AfxGetApp()->LoadIconW(IDI_ICON2));
-	fileCListCtrl.SetImageList(&imgList, LVSIL_SMALL);
 
 	stringTableValue.LoadStringW(FILE_CLIENT_IP_LABEL);
 	iPAddresscStatic.Create(stringTableValue, WS_VISIBLE, CRect(0, 0, 30, 20), this, IPADDRESSCEDIT_ID);
@@ -412,6 +426,13 @@ void CFileAgentView::OnBeginDrag(NMHDR * pNMHDR, LRESULT * pResult)
 	bDrag = true;
 
 	SetCapture();
+
+}
+
+void CFileAgentView::OnTvnSelChangedTree(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	LPNMTREEVIEW pNMTreeView = reinterpret_cast<LPNMTREEVIEW>(pNMHDR);
+
 
 }
 

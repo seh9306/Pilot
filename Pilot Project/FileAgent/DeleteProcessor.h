@@ -13,8 +13,6 @@ public:
 	~DeleteProcessor();
 
 	void PacketProcess(SOCKET sock, char *msg);
-private:
-	CFileAgentView* cFileAgentView;
 };
 
 #endif

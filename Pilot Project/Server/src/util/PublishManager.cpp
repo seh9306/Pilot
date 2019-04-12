@@ -61,8 +61,15 @@ bool PublishManager::Publish(char * dir, SOCKET sock)
 		&length, 0, NULL, NULL) == SOCKET_ERROR)
 	{
 		if (WSAGetLastError() != WSA_IO_PENDING)
-			std::cout << "WSASend() error ::: " << GetLastError() << std::endl;
-		return false;
+		{
+			// async send
+			std::cout << "async send" << std::endl;
+		}
+		else
+		{
+			delete files;
+			return false;
+		}
 	}
 
 	int bufOffset = 0;
@@ -90,8 +97,15 @@ bool PublishManager::Publish(char * dir, SOCKET sock)
 				&length, 0, NULL, NULL) == SOCKET_ERROR)
 			{
 				if (WSAGetLastError() != WSA_IO_PENDING)
-					std::cout << "WSASend() error :: " << GetLastError() << std::endl;
-				return false;
+				{
+					// async send
+					std::cout << "async send" << std::endl;
+				}
+				else
+				{
+					delete files;
+					return false;
+				}
 			}
 			else 
 			{
@@ -127,11 +141,19 @@ bool PublishManager::Publish(char * dir, SOCKET sock)
 			&length, 0, NULL, NULL) == SOCKET_ERROR)
 		{
 			if (WSAGetLastError() != WSA_IO_PENDING)
-				std::cout << "WSASend() error :: " << GetLastError() << std::endl;
-			return false;
+			{
+				// async send
+				std::cout << "async send" << std::endl;
+			}
+			else
+			{
+				delete files;
+				return false;
+			}
 		}
 	}
 
+	delete files;
 	return true;
 }
 
@@ -157,24 +179,12 @@ bool PublishManager::Publish(char * msg, std::list<SOCKET>& socks, int size)
 	return true;
 }
 
-void PublishManager::sSubscribe(char * msg, SOCKET sock)
+void PublishManager::Publish(char * msg, SOCKET sock, int size)
 {
 	WSABUF wsaBuf;
-
 	wsaBuf.buf = msg;
+	wsaBuf.len = size;
 	DWORD length = 0;
-
-	int dirLength = strlen(msg + SUB_HEADER_SIZE) + NULL_VALUE_SIZE;
-	// copy protocol type
-	wsaBuf.buf[0] = kSubscribe;
-	wsaBuf.buf[1] = true;
-
-	wsaBuf.len = 2;
-	memcpy(wsaBuf.buf + wsaBuf.len + sizeof(int), msg + SUB_HEADER_SIZE, dirLength);
-	wsaBuf.len += dirLength;
-
-	memcpy(wsaBuf.buf + PROTOCOL_TYPE_SIZE + 1, &dirLength, sizeof(int));
-	wsaBuf.len += sizeof(int);
 
 	if (WSASend(sock, &wsaBuf, 1,
 		&length, 0, NULL, NULL) == SOCKET_ERROR)
@@ -183,7 +193,6 @@ void PublishManager::sSubscribe(char * msg, SOCKET sock)
 			std::cout << "WSASend() error :: " << GetLastError() << std::endl;
 	}
 }
-
 // @TODO
 void PublishManager::fSubscribe(char * dir, SOCKET sock)
 {

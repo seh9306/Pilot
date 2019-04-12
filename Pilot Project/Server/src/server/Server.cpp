@@ -8,15 +8,15 @@
 #include "NetworkData.h"
 
 // packet process
-#include "../PacketProcessor/PacketProcessor.h"
-#include "../PacketProcessor/SubscribeProcessor.h"
-#include "../PacketProcessor/UnSubscribeProcessor.h"
-#include "../PacketProcessor/ShowProcessor.h"
+#include "PacketProcessor/PacketProcessor.h"
+#include "PacketProcessor/SubscribeProcessor.h"
+#include "PacketProcessor/UnSubscribeProcessor.h"
+#include "PacketProcessor/ShowProcessor.h"
 // ShowAddProcessor.h
-#include "../PacketProcessor/CreateProcessor.h"
-#include "../PacketProcessor/RenameProcessor.h"
-#include "../PacketProcessor/DeleteProcessor.h"
-#include "../PacketProcessor/MoveProcessor.h"
+#include "PacketProcessor/CreateProcessor.h"
+#include "PacketProcessor/RenameProcessor.h"
+#include "PacketProcessor/DeleteProcessor.h"
+#include "PacketProcessor/MoveProcessor.h"
 
 extern void error_handle(char *);
 
@@ -38,9 +38,29 @@ Server::Server()
 
 }
 
+Server::~Server()
+{
+	if (hServSock != INVALID_SOCKET)
+	{
+		closesocket(hServSock);
+	}
+	hServSock = INVALID_SOCKET;
+
+	int size = packetProcessors.size();
+	for (int index = 0; index < size; index++)
+	{
+		PacketProcessor* packetProcessor = packetProcessors.at(index);
+		if (packetProcessor)
+		{
+			delete packetProcessor;
+		}
+	}
+	packetProcessors.clear();
+	DeleteCriticalSection(&criticalSection);
+}
+
 bool Server::Init() 
 {
-
 	if (bind(hServSock, (SOCKADDR*)&servAddr, sizeof(SOCKADDR)) == -1) 
 	{
 		return kBindError;
@@ -63,46 +83,45 @@ bool Server::Init()
 	// Create IO CompletionPort
 	hCompletionPort = CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, 0);
 	
-	for (int i = 0; i < systemInfo.dwNumberOfProcessors; i++) 
-	{
-		Receiver receiver;
-		receiver.id = i;
-		std::thread IOCPThread(receiver, hCompletionPort, packetProcessors);
-		IOCPThread.detach();
-
-	}
+	InitializeCriticalSection(&criticalSection);
 
 	return true;
 }
 
 bool Server::Start() 
 {
-	int cnt = 0;
+	std::cout << "Start Network Explorer Server..." << std::endl;
+
+	for (int i = 0; i < systemInfo.dwNumberOfProcessors; i++)
+	{
+		Receiver receiver;
+		receiver.id = i;
+		std::thread IOCPThread(receiver, (Server *)this, hCompletionPort, packetProcessors);
+		std::cout << "Receiver Thread Start :: (" << i << ")" << std::endl;
+		IOCPThread.detach();
+
+	}
+
 	while (TRUE) 
 	{
 		SOCKET hClntSock;
 		SOCKADDR_IN clntAddr;
 		int addrLen = sizeof(clntAddr);
-		printf("waiting for client... %d\n", cnt);
+
 		hClntSock = accept(hServSock, (SOCKADDR*)&clntAddr, &addrLen);
-		cnt++;
+		clntInOut(1);
 
 		perHandleData = (LPPER_HANDLE_DATA)malloc(sizeof(PER_HANDLE_DATA));
 		perHandleData->hClntSock = hClntSock;
 		memcpy(&(perHandleData->clntAddr), &clntAddr, addrLen);
 
-		// params
-		// 1. client socket handle
-		// 2. 인자에 완료 포트 핸들이 있으면 생성이 아니고 추가한다.
-		// 3. 주소와 포트 
-		// 4. 0을 입력하면 cpu 개수에 따라 자동 설정(?)
 		CreateIoCompletionPort((HANDLE)hClntSock, hCompletionPort, (DWORD)perHandleData, 0);
 
 		perIoData = (LPPER_IO_DATA)malloc(sizeof(PER_IO_DATA));
 		memset(&(perIoData->overlapped), 0, sizeof(OVERLAPPED));
 		perIoData->wsaBuf.len = BUFSIZE;
 		perIoData->wsaBuf.buf = perIoData->buffer;
-		flags = 0; // (?)
+		flags = 0;
 
 		WSARecv(perHandleData->hClntSock,
 			&(perIoData->wsaBuf),
@@ -113,4 +132,12 @@ bool Server::Start()
 			nullptr
 		);
 	}
+}
+
+void Server::clntInOut(int count)
+{
+	EnterCriticalSection(&criticalSection);
+	numberOfClient +=  count;
+	LeaveCriticalSection(&criticalSection);
+	std::cout << "Number of client : " << numberOfClient << std::endl;
 }

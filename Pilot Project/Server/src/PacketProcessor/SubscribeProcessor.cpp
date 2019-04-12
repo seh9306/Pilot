@@ -1,8 +1,9 @@
 #include "SubscribeProcessor.h"
-#include "../util/SubscribeManager.h"
-#include "../util/PublishManager.h"
+#include "Util/SubscribeManager.h"
+#include "Util/PublishManager.h"
+#include "Util/FileManager.h"
 
-#define SP_DEBUG
+#include <iostream>
 
 SubscribeProcessor::SubscribeProcessor()
 {
@@ -18,6 +19,7 @@ void SubscribeProcessor::PacketProcess(SOCKET sock, char *msg)
 {
 	SubscribeManager& subscribeManager = SubscribeManager::GetInstance();
 	PublishManager& publishManager = PublishManager::GetInstance();
+	FileManager& fileManager = FileManager::GetInstance();
 
 	int length = 0;
 
@@ -31,7 +33,29 @@ void SubscribeProcessor::PacketProcess(SOCKET sock, char *msg)
 	// subscribe directory
 	if (subscribeManager.Subscribe(msg + SUB_HEADER_SIZE, sock)) 
 	{
-		publishManager.sSubscribe(msg, sock);
+		int dirLength = strlen(msg + SUB_HEADER_SIZE) + NULL_VALUE_SIZE;
+
+		// copy protocol type
+		msg[0] = kSubscribe;
+		msg[1] = true;
+
+		int len = 2;
+
+		memcpy(msg + len + sizeof(int), msg + SUB_HEADER_SIZE, dirLength);
+		len += dirLength;
+
+		memcpy(msg + PROTOCOL_TYPE_SIZE + 1, &dirLength, sizeof(int));
+		len += sizeof(int);
+
+		int numberOfDrives = (int)fileManager.GetNumberOfDrives();
+		memcpy(msg + len, &(numberOfDrives), sizeof(int));
+		len += sizeof(int);
+
+		wchar_t* pLogicalDriveStrings = fileManager.GetLogicalDriveStringsW();
+		memcpy(msg + len, pLogicalDriveStrings, (4 * numberOfDrives) * 2);
+		len += (4 * numberOfDrives) * 2;
+
+		publishManager.Publish(msg, sock, len);
 	}
 	else
 	{

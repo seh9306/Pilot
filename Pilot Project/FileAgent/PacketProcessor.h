@@ -1,6 +1,10 @@
 #ifndef PACKETPROCESSOR_H
 #define PACKETPROCESSOR_H
 
+#include <WinSock2.h>
+
+#include "FileAgentView.h"
+
 #define NUM_OF_PACKET_PROCESSOR 5
 
 #define SUB_HEADER_SIZE 5
@@ -25,15 +29,15 @@ enum protocolType {
 	kMove
 };
 
-#include <WinSock2.h>
-
 class PacketProcessor
 {
 public:
-	PacketProcessor() {};
+	PacketProcessor();
 	virtual ~PacketProcessor() {};
 	
 	virtual void PacketProcess(SOCKET sock, char *msg) = 0;
+protected:
+	CFileAgentView* cFileAgentView;
 };
 
 #endif
