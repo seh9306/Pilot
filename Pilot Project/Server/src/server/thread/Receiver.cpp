@@ -20,47 +20,53 @@ void Receiver::operator()(Server* server, HANDLE pComPort, std::vector<PacketPro
 			INFINITE
 		);
 
-		if (bytesTransferred == 0)
+		if (perIoData->type == IOCP_ASYNC_RECV)
 		{
-			std::string temp = subcribeManager.GetDirBySocket(perHandleData->hClntSock);
-			subcribeManager.UnSubscribe((char *)temp.c_str(), perHandleData->hClntSock);
-			std::cout << "Out clnt";
-			server->clntInOut(-1);
-			closesocket(perHandleData->hClntSock);
-			free(perHandleData);
-			free(perIoData);
-			continue;
+			if (bytesTransferred == 0)
+			{
+				std::cout << perIoData->type << "gggg" << std::endl;
+				std::string temp = subcribeManager.GetDirBySocket(perHandleData->hClntSock);
+				subcribeManager.UnSubscribe((char *)temp.c_str(), perHandleData->hClntSock);
+				std::cout << "Out clnt";
+				server->clntInOut(-1);
+				closesocket(perHandleData->hClntSock);
+				free(perHandleData);
+				free(perIoData);
+				continue;
+			}
+
+			// distribute packet
+			if (packetProcessors.size() > perIoData->wsaBuf.buf[0]) {
+				PacketProcessor *packetProcessor = packetProcessors.at(perIoData->wsaBuf.buf[0]);
+				// packet processing 
+				// according to each protocol number ( vector index )
+				packetProcessor->PacketProcess(perHandleData->hClntSock,
+					perIoData->wsaBuf.buf);
+			}
+			else {
+				std::cout << "no packet processor" << std::endl;
+			}
+
+			memset(&(perIoData->overlapped), 0, sizeof(OVERLAPPED));
+			perIoData->wsaBuf.len = BUFSIZE;
+			perIoData->wsaBuf.buf = perIoData->buffer;
+
+			flags = 0;
+
+			WSARecv(perHandleData->hClntSock,
+				&(perIoData->wsaBuf),
+				1,
+				nullptr,
+				&flags,
+				&(perIoData->overlapped),
+				nullptr
+			);
 		}
-
-		// decompress packet
-		// ...
-
-		// distribute packet
-		if (packetProcessors.size() > perIoData->wsaBuf.buf[0]) {
-			PacketProcessor *packetProcessor = packetProcessors.at(perIoData->wsaBuf.buf[0]);
-			// packet processing 
-			// according to each protocol number ( vector index )
-			packetProcessor->PacketProcess(perHandleData->hClntSock,
-				perIoData->wsaBuf.buf); 
+		else if (perIoData->type == IOCP_ASYNC_SEND)
+		{
+			std::cout << "메모리 누수 방지" << std::endl;
+			delete perIoData;
 		}
-		else {
-			std::cout << "no packet processor" << std::endl;
-		}			
-
-		memset(&(perIoData->overlapped), 0, sizeof(OVERLAPPED));
-		perIoData->wsaBuf.len = BUFSIZE;
-		perIoData->wsaBuf.buf = perIoData->buffer;
-
-		flags = 0;
-
-		WSARecv(perHandleData->hClntSock,
-			&(perIoData->wsaBuf),
-			1,
-			nullptr,
-			&flags,
-			&(perIoData->overlapped),
-			nullptr
-		);
 
 	}
 

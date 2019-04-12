@@ -121,6 +121,7 @@ bool Server::Start()
 		memset(&(perIoData->overlapped), 0, sizeof(OVERLAPPED));
 		perIoData->wsaBuf.len = BUFSIZE;
 		perIoData->wsaBuf.buf = perIoData->buffer;
+		perIoData->type = IOCP_ASYNC_RECV;
 		flags = 0;
 
 		WSARecv(perHandleData->hClntSock,

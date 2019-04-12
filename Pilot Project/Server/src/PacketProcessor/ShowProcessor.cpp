@@ -1,7 +1,5 @@
 #include "ShowProcessor.h"
 
-#include "../util/PublishManager.h"
-
 #include <iostream>
 
 ShowProcessor::ShowProcessor()
@@ -15,8 +13,6 @@ ShowProcessor::~ShowProcessor()
 
 void ShowProcessor::PacketProcess(SOCKET sock, char *msg)
 {
-	PublishManager& publishManager = PublishManager::GetInstance();
-
 	int length = 0;
 
 	memcpy(&length, msg + PROTOCOL_TYPE_SIZE + sizeof(DWORD), sizeof(int));
@@ -27,6 +23,6 @@ void ShowProcessor::PacketProcess(SOCKET sock, char *msg)
 	}
 
 	// publish to sub
-	publishManager.Publish(msg, sock);
+	publishManager->Publish(msg, sock);
 }
 

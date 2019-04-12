@@ -228,7 +228,6 @@
     <ResourceCompile Include="FileAgent.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ClassDiagram.cd" />
     <None Include="res\FileAgent.rc2" />
   </ItemGroup>
   <ItemGroup>

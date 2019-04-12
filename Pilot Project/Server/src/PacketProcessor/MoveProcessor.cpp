@@ -1,11 +1,6 @@
-#define _CRT_SECURE_NO_WARNINGS
-
 #include "MoveProcessor.h"
-#include "Util\PublishManager.h"
-#include "Util\FileManager.h"
-#include "Util\SubscribeManager.h"
 
-#include <iostream>
+extern void error_handle(char *msg);
 
 MoveProcessor::MoveProcessor()
 {
@@ -17,12 +12,10 @@ MoveProcessor::~MoveProcessor()
 
 void MoveProcessor::PacketProcess(SOCKET sock, char * msg)
 {
-	PublishManager& publishManager = PublishManager::GetInstance();
-
-	int dirLength = 0;
-	int fileNameLength = 0;
-	int goalLength = 0;
-
+	int dirLength		= 0;
+	int fileNameLength	= 0;
+	int goalLength		= 0;
+	
 	int byteOffset = 0 + PROTOCOL_TYPE_SIZE;
 
 	memcpy(&dirLength, msg + byteOffset, sizeof(int));
@@ -40,8 +33,6 @@ void MoveProcessor::PacketProcess(SOCKET sock, char * msg)
 	}
 
 	// File move
-	FileManager& fileManager = FileManager::GetInstance();
-
 	byteOffset = 0 + PROTOCOL_TYPE_SIZE + sizeof(int);
 	char* pDir = msg + byteOffset;
 
@@ -53,27 +44,25 @@ void MoveProcessor::PacketProcess(SOCKET sock, char * msg)
 
 	byteOffset += goalLength;
 
-	if (!fileManager.Move(pDir, pFileName, pNewFileDir))
+	if (!fileManager->Move(pDir, pFileName, pNewFileDir))
 	{
-		std::cout << "file rename fail" << std::endl;
+		error_handle("file rename fail");
 		return;
 	}
 
 	// Publish
-	SubscribeManager& subscribeManager = SubscribeManager::GetInstance();
-
-	std::list<SOCKET>* sockets = subscribeManager.GetSocketsByDir(pDir);
+	std::list<SOCKET>* sockets = subscribeManager->GetSocketsByDir(pDir);
 
 	byteOffset += sizeof(WIN32_FIND_DATA);
 
 	if (sockets != nullptr)
 	{
-		publishManager.Publish(msg, *sockets, RENAME_HEADER_SIZE + dirLength + fileNameLength);
+		publishManager->Publish(msg, *sockets, RENAME_HEADER_SIZE + dirLength + fileNameLength);
 	}
 
-	sockets = subscribeManager.GetSocketsByDir(pNewFileDir);
+	sockets = subscribeManager->GetSocketsByDir(pNewFileDir);
 	if(sockets != nullptr)
 	{
-		publishManager.Publish(msg, *sockets, byteOffset);
+		publishManager->Publish(msg, *sockets, byteOffset);
 	}
 }

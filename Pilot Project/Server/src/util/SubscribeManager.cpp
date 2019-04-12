@@ -56,11 +56,16 @@ bool SubscribeManager::UnSubscribe(char * dir, SOCKET sock)
 	if (search != sockets.end())
 	{
 		std::list<SOCKET>* temp = search->second;
-		std::list<SOCKET>::iterator it;
-		
-		for (it = temp->begin(); it != temp->end(); it++)
+		if (temp == nullptr)
 		{
-			if (*it == sock) 
+			return false;
+		}
+		auto it = temp->begin();
+		
+		for (;it != temp->end(); it++)
+		{
+			SOCKET s = *it;
+			if (s == sock) 
 			{
 				temp->erase(it);
 				break;

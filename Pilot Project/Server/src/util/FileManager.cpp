@@ -1,8 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 #include <Windows.h>
-#include <cstdio>
-#include <cstring>
 
 #include "FileManager.h"
 
@@ -58,7 +56,7 @@ std::list<WIN32_FIND_DATA>* FileManager::GetFileList(char *dir)
 	return files;
 }
 
-bool FileManager::DeleteFileByFileName(char* dir, char* fileName, char type)
+bool FileManager::DeleteFileByFileName(char* dir, char* fileName, char fileType)
 {
 	char* temp = new char[strlen(dir) + strlen(fileName) + 1];
 
@@ -67,7 +65,7 @@ bool FileManager::DeleteFileByFileName(char* dir, char* fileName, char type)
 	strcat(temp, dir);
 	strcat(temp, fileName);
 
-	if (type == 1)
+	if (fileType == 1) // FILE_TYPE_DIRECTORY
 	{
 		// @issue recursion delete
 		bool result = RemoveDirectory(temp);
@@ -75,7 +73,7 @@ bool FileManager::DeleteFileByFileName(char* dir, char* fileName, char type)
 		delete[]temp;
 		return result;
 	}
-	else
+	else if(fileType == 0) // FILE_TYPE_NORMAL
 	{
 		HANDLE hFile;
 

@@ -2,6 +2,8 @@
 #define NETWORK_DATA_H
 
 #define BUFSIZE 1024
+#define IOCP_ASYNC_RECV 1
+#define IOCP_ASYNC_SEND 2
 
 #include <WinSock2.h>
 

@@ -166,14 +166,26 @@ bool PublishManager::Publish(char * msg, std::list<SOCKET>& socks, int size)
 
 	for (SOCKET sock : socks)
 	{
+		LPPER_IO_DATA perIoData = (LPPER_IO_DATA)malloc(sizeof(PER_IO_DATA));
+		memset(&(perIoData->overlapped), 0, sizeof(OVERLAPPED));
+		perIoData->wsaBuf.len = BUFSIZE;
+		perIoData->wsaBuf.buf = perIoData->buffer;
+		perIoData->type = IOCP_ASYNC_SEND;
+
 		if (WSASend(sock, &wsaBuf, 1,
-			&length, 0, NULL, NULL) == SOCKET_ERROR)
+			&length, 0, &(perIoData->overlapped), nullptr) == SOCKET_ERROR)
+		{
+			if (WSAGetLastError() != WSA_IO_PENDING)
+				std::cout << "WSASend() error :: " << GetLastError() << std::endl;
+		}
+
+		if (WSASend(sock, &wsaBuf, 1,
+			&length, 0, NULL, nullptr) == SOCKET_ERROR)
 		{
 			if (WSAGetLastError() != WSA_IO_PENDING)
 			{
 				std::cout << "WSASend() error :: " << GetLastError() << std::endl;
 			}
-				
 		}
 	}
 	return true;
@@ -186,28 +198,14 @@ void PublishManager::Publish(char * msg, SOCKET sock, int size)
 	wsaBuf.len = size;
 	DWORD length = 0;
 
-	if (WSASend(sock, &wsaBuf, 1,
-		&length, 0, NULL, NULL) == SOCKET_ERROR)
-	{
-		if (WSAGetLastError() != WSA_IO_PENDING)
-			std::cout << "WSASend() error :: " << GetLastError() << std::endl;
-	}
-}
-// @TODO
-void PublishManager::fSubscribe(char * dir, SOCKET sock)
-{
-	WSABUF wsaBuf;
-
-	wsaBuf.buf = dir;
-	DWORD length = 0;
-
-	// copy protocol type
-	wsaBuf.buf[0] = kSubscribe;
-	wsaBuf.buf[1] = false;
-	wsaBuf.len = 2;
+	LPPER_IO_DATA perIoData = (LPPER_IO_DATA)malloc(sizeof(PER_IO_DATA));
+	memset(&(perIoData->overlapped), 0, sizeof(OVERLAPPED));
+	perIoData->wsaBuf.len = BUFSIZE;
+	perIoData->wsaBuf.buf = perIoData->buffer;
+	perIoData->type = IOCP_ASYNC_SEND;
 
 	if (WSASend(sock, &wsaBuf, 1,
-		&length, 0, NULL, NULL) == SOCKET_ERROR)
+		&length, 0, &(perIoData->overlapped), nullptr) == SOCKET_ERROR)
 	{
 		if (WSAGetLastError() != WSA_IO_PENDING)
 			std::cout << "WSASend() error :: " << GetLastError() << std::endl;

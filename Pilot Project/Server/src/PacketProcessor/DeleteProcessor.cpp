@@ -1,14 +1,10 @@
 #include "DeleteProcessor.h"
-#include "Util\PublishManager.h"
-#include "Util\FileManager.h"
-#include "Util\SubscribeManager.h"
 
-#include <iostream>
+extern void error_handle(char *msg);
 
 DeleteProcessor::DeleteProcessor()
 {
 }
-
 
 DeleteProcessor::~DeleteProcessor()
 {
@@ -16,17 +12,17 @@ DeleteProcessor::~DeleteProcessor()
 
 void DeleteProcessor::PacketProcess(SOCKET sock, char* msg)
 {
-	PublishManager& publishManager = PublishManager::GetInstance();
-
-	int dirLength = 0;
-	int fileNameLength = 0;
+	int dirLength		= 0;
+	int fileNameLength	= 0;
 
 	int byteOffset = PROTOCOL_TYPE_SIZE + FILE_TYPE_SIZE;
 
-	if (msg[1] != 0 && msg[1] != 1)
+	if (msg[FILE_TYPE_INDEX] != FILE_TYPE_NORMAL 
+		&& msg[FILE_TYPE_INDEX] != FILE_TYPE_DIRECTORY)
 	{
 		return;
 	}
+
 	char fileType = msg[1];
 
 	memcpy(&dirLength, msg + byteOffset, sizeof(int));
@@ -40,24 +36,26 @@ void DeleteProcessor::PacketProcess(SOCKET sock, char* msg)
 	}
 
 	// File delete
-	FileManager& fileManager = FileManager::GetInstance();
-
-	char* pDir = msg + PROTOCOL_TYPE_SIZE + FILE_TYPE_SIZE + sizeof(int);
+	char* pDir	= msg + PROTOCOL_TYPE_SIZE + FILE_TYPE_SIZE + sizeof(int);
 	char* pFile = msg + PROTOCOL_TYPE_SIZE + FILE_TYPE_SIZE + sizeof(int) + dirLength + sizeof(int);
 
-	if (!fileManager.DeleteFileByFileName(pDir, pFile, fileType))
+	if (!fileManager->DeleteFileByFileName(pDir, pFile, fileType))
 	{
-		std::cout << "file delete fail" << std::endl;
+		error_handle("file delete fail");
 		return;
 	}
 
 	// Publish
-	SubscribeManager& subscribeManager = SubscribeManager::GetInstance();
-
-	std::list<SOCKET>* sockets = subscribeManager.GetSocketsByDir(pDir);
+	std::list<SOCKET>* sockets = subscribeManager->GetSocketsByDir(pDir);
 
 	if (sockets != nullptr)
 	{
-		publishManager.Publish(msg, *sockets, PROTOCOL_TYPE_SIZE + FILE_TYPE_SIZE + sizeof(int) + dirLength + sizeof(int) + fileNameLength);
+		publishManager->Publish(msg, *sockets, PROTOCOL_TYPE_SIZE 
+			+ FILE_TYPE_SIZE 
+			+ sizeof(int) 
+			+ dirLength 
+			+ sizeof(int) 
+			+ fileNameLength
+		);
 	}
 }

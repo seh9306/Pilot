@@ -2,6 +2,7 @@
 #define DELETEPROCESSOR_H
 
 #include "PacketProcessor.h"
+
 class DeleteProcessor :
 	public PacketProcessor
 {

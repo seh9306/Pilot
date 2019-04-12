@@ -138,7 +138,6 @@
     <None Include="res\FileAgent.rc2">
       <Filter>리소스 파일</Filter>
     </None>
-    <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\FileAgentDoc.ico">

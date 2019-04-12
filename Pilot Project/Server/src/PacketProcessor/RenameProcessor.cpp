@@ -1,9 +1,6 @@
 #include "RenameProcessor.h"
-#include "Util\PublishManager.h"
-#include "Util\FileManager.h"
-#include "Util\SubscribeManager.h"
 
-#include <iostream>
+extern void error_handle(char *msg);
 
 RenameProcessor::RenameProcessor()
 {
@@ -16,11 +13,9 @@ RenameProcessor::~RenameProcessor()
 
 void RenameProcessor::PacketProcess(SOCKET sock, char * msg)
 {
-	PublishManager& publishManager = PublishManager::GetInstance();
-
-	int dirLength = 0;
-	int oldFileLength = 0;
-	int newFileLength = 0;
+	int dirLength		= 0;
+	int oldFileLength	= 0;
+	int newFileLength	= 0;
 
 	int byteOffset = 0 + PROTOCOL_TYPE_SIZE;
 
@@ -39,8 +34,6 @@ void RenameProcessor::PacketProcess(SOCKET sock, char * msg)
 	}
 
 	// File rename
-	FileManager& fileManager = FileManager::GetInstance();
-
 	byteOffset = 0 + PROTOCOL_TYPE_SIZE + sizeof(int);
 	char* pDir = msg + byteOffset;
 
@@ -50,19 +43,17 @@ void RenameProcessor::PacketProcess(SOCKET sock, char * msg)
 	byteOffset += oldFileLength + sizeof(int);
 	char* pNewFile = msg + byteOffset;
 
-	if (!fileManager.Rename(pDir, pOldFile, pNewFile))
+	if (!fileManager->Rename(pDir, pOldFile, pNewFile))
 	{
-		std::cout << "file rename fail" << std::endl;
+		error_handle("file rename fail");
 		return;
 	}
 
 	// Publish
-	SubscribeManager& subscribeManager = SubscribeManager::GetInstance();
-
-	std::list<SOCKET>* sockets = subscribeManager.GetSocketsByDir(pDir);
+	std::list<SOCKET>* sockets = subscribeManager->GetSocketsByDir(pDir);
 
 	if (sockets != nullptr)
 	{
-		publishManager.Publish(msg, *sockets, RENAME_HEADER_SIZE + dirLength + oldFileLength + newFileLength);
+		publishManager->Publish(msg, *sockets, RENAME_HEADER_SIZE + dirLength + oldFileLength + newFileLength);
 	}
 }
