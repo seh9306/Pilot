@@ -44,7 +44,7 @@ void Receiver::operator()(HANDLE pComPort, std::vector<PacketProcessor *> &packe
 				perIoData->wsaBuf.buf); 
 		}
 		else {
-			std::cout << "NULL~" << std::endl;
+			std::cout << "no packet processor" << std::endl;
 		}			
 
 		memset(&(perIoData->overlapped), 0, sizeof(OVERLAPPED));

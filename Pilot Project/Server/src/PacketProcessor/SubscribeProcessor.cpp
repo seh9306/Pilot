@@ -4,10 +4,6 @@
 
 #define SP_DEBUG
 
-#ifdef SP_DEBUG
-#include <iostream>
-#endif
-
 SubscribeProcessor::SubscribeProcessor()
 {
 }
@@ -35,9 +31,6 @@ void SubscribeProcessor::PacketProcess(SOCKET sock, char *msg)
 	// subscribe directory
 	if (subscribeManager.Subscribe(msg + SUB_HEADER_SIZE, sock)) 
 	{
-#ifdef SP_DEBUG
-		std::cout << "Subscribe success :: " << msg + SUB_HEADER_SIZE <<std::endl;
-#endif
 		publishManager.sSubscribe(msg, sock);
 	}
 	else

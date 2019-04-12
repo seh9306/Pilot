@@ -112,7 +112,7 @@ bool PublishManager::Publish(char * dir, SOCKET sock)
 		// copy file name
 		memcpy(wsaBuf.buf
 			+ bufOffset, file.cFileName, fileNameSize + NULL_VALUE_SIZE);
-		//std::cout << wsaBuf.buf + bufOffset << ":::" << bufOffset << std::endl;
+
 		bufOffset += fileNameSize + NULL_VALUE_SIZE;
 		
 	}
@@ -144,7 +144,6 @@ bool PublishManager::Publish(char * msg, std::list<SOCKET>& socks, int size)
 
 	for (SOCKET sock : socks)
 	{
-		std::cout << "Àü¼Û" << std::endl;
 		if (WSASend(sock, &wsaBuf, 1,
 			&length, 0, NULL, NULL) == SOCKET_ERROR)
 		{
