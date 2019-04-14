@@ -2,7 +2,7 @@
 #include "PacketProcessor/PacketProcessor.h"
 #include "Util/SubscribeManager.h"
 #include "Receiver.h"
-
+#include "Server/Server.h"
 
 #include <iostream>
 #include <string>
@@ -64,7 +64,6 @@ void Receiver::operator()(Server* server, HANDLE pComPort, std::vector<PacketPro
 		}
 		else if (perIoData->type == IOCP_ASYNC_SEND)
 		{
-			std::cout << "메모리 누수 방지" << std::endl;
 			delete perIoData;
 		}
 

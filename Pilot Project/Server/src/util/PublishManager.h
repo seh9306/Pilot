@@ -4,15 +4,18 @@
 #include <WinSock2.h>
 #include <list>
 
+#include "Server/NetworkData.h"
+
 class PublishManager
 {
 public:
 	virtual ~PublishManager();
 	static PublishManager& GetInstance();
+	LPPER_IO_DATA CreateData(char* msg, int size);
+	bool SendForPublish(SOCKET sock, LPPER_IO_DATA perIoData);
 	bool Publish(char *dir, SOCKET sock);
 	bool Publish(char * msg, std::list<SOCKET>& socks, int size);
 	void Publish(char* msg, SOCKET sock, int size);
-	void fSubscribe(char* dir, SOCKET sock);
 private:
 	PublishManager();
 };

@@ -46,6 +46,7 @@ void ShowAddProcessor::PacketProcess(SOCKET sock, char *msg)
 		// @issue sync
 		cFileAgentView->AddItem(file);
 	}
+
 	// @issue sync
 	if (cFileAgentView->GetListSize() 
 		- cFileAgentView->GetItemSize() == 0)

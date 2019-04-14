@@ -1,13 +1,9 @@
 #include "PublishManager.h"
 #include "FileManager.h"
-#include "../Server/NetworkData.h"
-#include "../PacketProcessor/PacketProcessor.h"
 
-#define PM_DEBUG
+#include "PacketProcessor/PacketProcessor.h"
 
-#ifdef PM_DEBUG
 #include <iostream>
-#endif
 
 #include <WinSock2.h>
 
@@ -25,162 +21,40 @@ PublishManager& PublishManager::GetInstance()
 	return publishManager;
 }
 
-bool PublishManager::Publish(char * dir, SOCKET sock)
+LPPER_IO_DATA PublishManager::CreateData(char* msg, int size)
 {
-	FileManager& fileManager = FileManager::GetInstance();
+	LPPER_IO_DATA perIoData = (LPPER_IO_DATA)malloc(sizeof(PER_IO_DATA));
 
-	std::list<WIN32_FIND_DATA>* files = fileManager.GetFileList(dir + SUB_HEADER_SIZE + sizeof(DWORD));
+	memset(&(perIoData->overlapped), 0, sizeof(OVERLAPPED));
+	perIoData->wsaBuf.len = size;
 
-	if (files == nullptr) 
-	{
-		// send fail
-		return false;
+	// copy data
+	if (msg != nullptr) {
+		memcpy(perIoData->buffer, msg, size);
 	}
-
-	int listSize = files->size();
 	
-	DWORD showNumber;
-	memcpy(&showNumber, dir + PROTOCOL_TYPE_SIZE, sizeof(DWORD));
-	
-	WSABUF wsaBuf;
-	wsaBuf.buf = dir;
-	wsaBuf.len = 0;
-	DWORD length = 0;
+	perIoData->wsaBuf.buf = perIoData->buffer;
 
-	// copy protocol type
-	wsaBuf.buf[0] = kShow;
-	wsaBuf.len += PROTOCOL_TYPE_SIZE;
+	perIoData->type = IOCP_ASYNC_SEND;
 
-	// copy list size
-	memcpy(wsaBuf.buf
-		+ wsaBuf.len, &listSize, sizeof(int));
-	wsaBuf.len += sizeof(int);
-
-	// @send
-	if (WSASend(sock, &wsaBuf, 1,
-		&length, 0, NULL, NULL) == SOCKET_ERROR)
-	{
-		if (WSAGetLastError() != WSA_IO_PENDING)
-		{
-			// async send
-			std::cout << "async send" << std::endl;
-		}
-		else
-		{
-			delete files;
-			return false;
-		}
-	}
-
-	int bufOffset = 0;
-	wsaBuf.buf[0] = kShowAdd;
-	bufOffset = 0 + PROTOCOL_TYPE_SIZE;
-	memcpy(wsaBuf.buf + bufOffset, &showNumber, sizeof(DWORD));
-	bufOffset += sizeof(DWORD);
-
-	for (WIN32_FIND_DATA file : *files)
-	{
-		int fileNameSize = strlen(file.cFileName);
-
-		int size = WIN_FIND_DATA_FRONT_SIZE
-			+ fileNameSize
-			+ sizeof(fileNameSize)
-			+ NULL_VALUE_SIZE;
-		
-		if (size + bufOffset > BUFSIZE - 2 ) 
-		{
-			wsaBuf.len = 1024; //bufOffset;
-			wsaBuf.buf[bufOffset] = '\n';
-
-			// publish
-			if (WSASend(sock, &wsaBuf, 1,
-				&length, 0, NULL, NULL) == SOCKET_ERROR)
-			{
-				if (WSAGetLastError() != WSA_IO_PENDING)
-				{
-					// async send
-					std::cout << "async send" << std::endl;
-				}
-				else
-				{
-					delete files;
-					return false;
-				}
-			}
-			else 
-			{
-				bufOffset = 0 + PROTOCOL_TYPE_SIZE + sizeof(DWORD);
-			}
-		}
-
-		// copy file data front
-		memcpy(wsaBuf.buf
-			+ bufOffset, &file, WIN_FIND_DATA_FRONT_SIZE);
-		bufOffset += WIN_FIND_DATA_FRONT_SIZE;
-		
-		// copy file name size
-		memcpy(wsaBuf.buf
-			+ bufOffset, &fileNameSize, sizeof(int));
-		bufOffset += sizeof(int);
-
-		// copy file name
-		memcpy(wsaBuf.buf
-			+ bufOffset, file.cFileName, fileNameSize + NULL_VALUE_SIZE);
-
-		bufOffset += fileNameSize + NULL_VALUE_SIZE;
-		
-	}
-
-	if (bufOffset != NULL)
-	{
-		wsaBuf.len = 1024; //bufOffset;
-		wsaBuf.buf[bufOffset] = '\n';
-
-		// publish
-		if (WSASend(sock, &wsaBuf, 1,
-			&length, 0, NULL, NULL) == SOCKET_ERROR)
-		{
-			if (WSAGetLastError() != WSA_IO_PENDING)
-			{
-				// async send
-				std::cout << "async send" << std::endl;
-			}
-			else
-			{
-				delete files;
-				return false;
-			}
-		}
-	}
-
-	delete files;
-	return true;
+	return perIoData;
 }
 
 bool PublishManager::Publish(char * msg, std::list<SOCKET>& socks, int size)
 {
-	WSABUF wsaBuf;
-	wsaBuf.buf = msg;
-	wsaBuf.len = size;
-	DWORD length = 0;
-
 	for (SOCKET sock : socks)
 	{
-		LPPER_IO_DATA perIoData = (LPPER_IO_DATA)malloc(sizeof(PER_IO_DATA));
-		memset(&(perIoData->overlapped), 0, sizeof(OVERLAPPED));
-		perIoData->wsaBuf.len = BUFSIZE;
-		perIoData->wsaBuf.buf = perIoData->buffer;
-		perIoData->type = IOCP_ASYNC_SEND;
+		LPPER_IO_DATA perIoData = CreateData(msg, size);
 
-		if (WSASend(sock, &wsaBuf, 1,
-			&length, 0, &(perIoData->overlapped), nullptr) == SOCKET_ERROR)
+		if (WSASend(sock, &(perIoData->wsaBuf), 1,
+			nullptr, 0, &(perIoData->overlapped), nullptr) == SOCKET_ERROR)
 		{
 			if (WSAGetLastError() != WSA_IO_PENDING)
 				std::cout << "WSASend() error :: " << GetLastError() << std::endl;
 		}
 
-		if (WSASend(sock, &wsaBuf, 1,
-			&length, 0, NULL, nullptr) == SOCKET_ERROR)
+		if (WSASend(sock, &(perIoData->wsaBuf), 1,
+			nullptr, 0, NULL, nullptr) == SOCKET_ERROR)
 		{
 			if (WSAGetLastError() != WSA_IO_PENDING)
 			{
@@ -193,19 +67,12 @@ bool PublishManager::Publish(char * msg, std::list<SOCKET>& socks, int size)
 
 void PublishManager::Publish(char * msg, SOCKET sock, int size)
 {
-	WSABUF wsaBuf;
-	wsaBuf.buf = msg;
-	wsaBuf.len = size;
-	DWORD length = 0;
-
-	LPPER_IO_DATA perIoData = (LPPER_IO_DATA)malloc(sizeof(PER_IO_DATA));
-	memset(&(perIoData->overlapped), 0, sizeof(OVERLAPPED));
-	perIoData->wsaBuf.len = BUFSIZE;
-	perIoData->wsaBuf.buf = perIoData->buffer;
+	LPPER_IO_DATA perIoData = CreateData(msg, size);
+	
 	perIoData->type = IOCP_ASYNC_SEND;
 
-	if (WSASend(sock, &wsaBuf, 1,
-		&length, 0, &(perIoData->overlapped), nullptr) == SOCKET_ERROR)
+	if (WSASend(sock, &(perIoData->wsaBuf), 1,
+		nullptr, 0, &(perIoData->overlapped), nullptr) == SOCKET_ERROR)
 	{
 		if (WSAGetLastError() != WSA_IO_PENDING)
 			std::cout << "WSASend() error :: " << GetLastError() << std::endl;

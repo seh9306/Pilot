@@ -4,7 +4,7 @@
 #include <WinSock2.h>
 #include <vector>
 
-#include "Server\Server.h"
+class Server;
 
 class Receiver {
 public:
