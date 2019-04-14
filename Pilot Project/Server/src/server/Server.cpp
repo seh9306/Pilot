@@ -17,6 +17,7 @@
 #include "PacketProcessor/RenameProcessor.h"
 #include "PacketProcessor/DeleteProcessor.h"
 #include "PacketProcessor/MoveProcessor.h"
+#include "PacketProcessor/ConnectProcessor.h"
 
 extern void error_handle(char *);
 
@@ -79,6 +80,7 @@ bool Server::Init()
 	packetProcessors.push_back(new RenameProcessor());
 	packetProcessors.push_back(new DeleteProcessor());
 	packetProcessors.push_back(new MoveProcessor());
+	packetProcessors.push_back(new ConnectProcessor());
 
 	// Create IO CompletionPort
 	hCompletionPort = CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, 0);

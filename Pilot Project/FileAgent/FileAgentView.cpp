@@ -233,6 +233,11 @@ void CFileAgentView::SetItemCountEx(int count)
 	}
 }
 
+void CFileAgentView::AddDrives(wchar_t* pLogicalDriveStrings, int type)
+{
+	fileCTreeCtrl.InsertItem(pLogicalDriveStrings, 0, 0, TVI_ROOT);
+}
+
 // CFileAgentView 메시지 처리기
 int CFileAgentView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
@@ -249,15 +254,15 @@ int CFileAgentView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	fileCTreeCtrl.SetImageList(&imgList, LVSIL_NORMAL);
 
 	// @temp 
-	HTREEITEM hItem = nullptr;
+	/*HTREEITEM hItem = nullptr;
 	hItem = fileCTreeCtrl.InsertItem(TEXT("바탕 화면"), 0, 0, TVI_ROOT);
 	hItem = fileCTreeCtrl.InsertItem(TEXT("내 문서"), 0, 5, hItem);
 	fileCTreeCtrl.InsertItem(TEXT("내 그림"), 2, 5, hItem);
 	fileCTreeCtrl.InsertItem(TEXT("내 비디오"), 3, 5, hItem);
 	hItem = fileCTreeCtrl.InsertItem(TEXT("Sample folder"), 4, 5, hItem);
 	hItem = fileCTreeCtrl.InsertItem(TEXT("Sub folder"), 4, 5, hItem);
-
-	fileCTreeCtrl.EnsureVisible(hItem);
+	
+	fileCTreeCtrl.EnsureVisible(hItem);*/
 
 	// setting column name
 	stringTableValue.LoadStringW(FILE_CLIENT_COLUMN_NAME);

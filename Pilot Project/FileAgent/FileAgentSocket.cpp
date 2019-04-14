@@ -9,6 +9,7 @@
 #include "RenameProcessor.h"
 #include "DeleteProcessor.h"
 #include "MoveProcessor.h"
+#include "ConnectProcessor.h"
 
 #include "Receiver.h"
 #include <thread>
@@ -32,6 +33,7 @@ FileAgentSocket::FileAgentSocket()
 	packetProcessors.push_back(new RenameProcessor());
 	packetProcessors.push_back(new DeleteProcessor());
 	packetProcessors.push_back(new MoveProcessor());
+	packetProcessors.push_back(new ConnectProcessor());
 
 }
 
@@ -110,16 +112,16 @@ void FileAgentSocket::Connect(char *ipAddress, int port)
 	IOCPThread.detach();
 	// ¸Þ½ÃÁö ÆßÇÎ
 	/*bool connecting = true;
-	std::thread t([&](sockaddr_in* srv_addr)
+	std::thread t([&]()
 	{
 		connect(fileAgentSocket, (sockaddr *)&srv_addr, sizeof(srv_addr));
 		connecting = false;
-	}, srv_addr);
+	});
 
 	while (connecting)
 	{
 		MSG msg = { 0, };
-		while (connecting && PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+		while (connecting && GetMessage(&msg, nullptr, 0, 0))
 		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
@@ -128,14 +130,18 @@ void FileAgentSocket::Connect(char *ipAddress, int port)
 	}*/
 
 	// @issue TEXT String Table
+	//WSAConnect(fileAgentSocket, (sockaddr *)&srv_addr, sizeof(srv_addr), nullptr, nullptr, nullptr, nullptr);
 	if (connect(fileAgentSocket, (sockaddr *)&srv_addr, sizeof(srv_addr)) == -1) {
 		stringTableValue.LoadStringW(FILE_CLIENT_CONNECT_FAIL);
 		AfxMessageBox(stringTableValue);
 		fileAgentSocket = INVALID_SOCKET;
 		return;
 	}
+
 	stringTableValue.LoadStringW(FILE_CLIENT_CONNECT_SUCCESS);
 	AfxMessageBox(stringTableValue);
+
+	SendConnectionMessage();
 
 	perHandleData = (LPPER_HANDLE_DATA)malloc(sizeof(PER_HANDLE_DATA));
 	perHandleData->hClntSock = fileAgentSocket;
@@ -157,6 +163,22 @@ void FileAgentSocket::Connect(char *ipAddress, int port)
 		&(perIoData->overlapped),
 		nullptr
 	);
+}
+
+void FileAgentSocket::SendConnectionMessage()
+{
+	dataBuf.buf = buffer;
+	
+	dataBuf.buf[0] = kConnect;
+	dataBuf.len = 0 + PROTOCOL_TYPE_SIZE;
+
+	if (WSASend(fileAgentSocket, &dataBuf, 1, (LPDWORD)&sendBytes, 0, NULL, NULL) == SOCKET_ERROR)
+	{
+		if (WSAGetLastError() != WSA_IO_PENDING)
+		{
+			TRACE("error");
+		}
+	}
 }
 
 // @issue

@@ -35,7 +35,8 @@ enum protocolType {
 	kCreate,
 	kRename,
 	kDelete,
-	kMove
+	kMove,
+	kConnect
 };
 
 class PacketProcessor

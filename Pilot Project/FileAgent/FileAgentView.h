@@ -79,6 +79,7 @@ public:
 	DWORD GetShowNumber();
 	char* GetPCharDir();
 	void SetItemCountEx(int count = -1);
+	void AddDrives(wchar_t * pLogicalDriveStrings, int type);
 // 재정의입니다.
 public:
 	virtual void OnDraw(CDC* pDC);  // 이 뷰를 그리기 위해 재정의되었습니다.

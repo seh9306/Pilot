@@ -16,7 +16,6 @@ void Receiver::operator()(HANDLE pComPort, std::vector<PacketProcessor *> &packe
 			(LPOVERLAPPED*)&perIoData,
 			INFINITE
 		);
-
 		if (bytesTransferred == 0)
 		{
 			// @issue make socket INVALID_SOCKET

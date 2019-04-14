@@ -37,16 +37,8 @@ void SubscribeProcessor::PacketProcess(SOCKET sock, char *msg)
 		memcpy(msg + len + sizeof(int), msg + SUB_HEADER_SIZE, dirLength);
 		len += dirLength;
 
-		memcpy(msg + PROTOCOL_TYPE_SIZE + 1, &dirLength, sizeof(int));
+		memcpy(msg + PROTOCOL_TYPE_SIZE + SUCCESS_SUBSCRIBE_INDEX, &dirLength, sizeof(int));
 		len += sizeof(int);
-
-		int numberOfDrives = (int)fileManager->GetNumberOfDrives();
-		memcpy(msg + len, &(numberOfDrives), sizeof(int));
-		len += sizeof(int);
-
-		wchar_t* pLogicalDriveStrings = fileManager->GetLogicalDriveStringsW();
-		memcpy(msg + len, pLogicalDriveStrings, (4 * numberOfDrives) * 2);
-		len += (4 * numberOfDrives) * 2;
 
 		publishManager->Publish(msg, sock, len);
 	}

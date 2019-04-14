@@ -20,7 +20,6 @@ void SubscribeProcessor::PacketProcess(SOCKET sock, char *msg)
 
 	if (msg[SUCCESS_SUBSCRIBE_INDEX])
 	{// success
-		int length = 0;
 		int byteOffset = PROTOCOL_TYPE_SIZE + SUCCESS_SUBSCRIBE_INDEX;
 
 		// clear vector and generate number
@@ -28,14 +27,15 @@ void SubscribeProcessor::PacketProcess(SOCKET sock, char *msg)
 		DWORD showNumber = cFileAgentView->GenerateShowNumber();
 		cFileAgentView->ClearItem();
 
+		int length = 0;
+
 		memcpy(&length, msg + byteOffset, sizeof(int));
 		byteOffset += sizeof(int);
-
-		//app->SetDirectory(msg + byteOffset, length);
 
 		FileAgentSocket *fileAgentSocket = FileAgentSocket::GetInstance();
 
 		fileAgentSocket->Show(msg + byteOffset, showNumber);
+		
 	}
 	else
 	{// fail

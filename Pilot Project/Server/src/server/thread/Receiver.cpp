@@ -24,7 +24,6 @@ void Receiver::operator()(Server* server, HANDLE pComPort, std::vector<PacketPro
 		{
 			if (bytesTransferred == 0)
 			{
-				std::cout << perIoData->type << "gggg" << std::endl;
 				std::string temp = subcribeManager.GetDirBySocket(perHandleData->hClntSock);
 				subcribeManager.UnSubscribe((char *)temp.c_str(), perHandleData->hClntSock);
 				std::cout << "Out clnt";
