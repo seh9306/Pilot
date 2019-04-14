@@ -12,8 +12,6 @@ public:
 	virtual ~PublishManager();
 	static PublishManager& GetInstance();
 	LPPER_IO_DATA CreateData(char* msg, int size);
-	bool SendForPublish(SOCKET sock, LPPER_IO_DATA perIoData);
-	bool Publish(char *dir, SOCKET sock);
 	bool Publish(char * msg, std::list<SOCKET>& socks, int size);
 	void Publish(char* msg, SOCKET sock, int size);
 private:

@@ -43,6 +43,7 @@ void ShowAddProcessor::PacketProcess(SOCKET sock, char *msg)
 		memcpy(&(file.cFileName), CString(msg + offset), (length + NULL_VALUE_SIZE) * 2);
 
 		offset += length + NULL_VALUE_SIZE;
+
 		// @issue sync
 		cFileAgentView->AddItem(file);
 	}
@@ -51,6 +52,7 @@ void ShowAddProcessor::PacketProcess(SOCKET sock, char *msg)
 	if (cFileAgentView->GetListSize() 
 		- cFileAgentView->GetItemSize() == 0)
 	{
+		cFileAgentView->SortItemsByNameAndAttribute();
 		cFileAgentView->SetItemCountEx();
 	}
 	

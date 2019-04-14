@@ -71,6 +71,7 @@ public:
 	void DeleteItem(char * fileName);
 	void RenameItem(char * oldName, char * newName);
 	void ClearItem();
+	void SortItemsByNameAndAttribute();
 	int GetItemSize();
 	int GetListSize();
 	void SetListSize(int listSize);

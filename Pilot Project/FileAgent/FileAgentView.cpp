@@ -9,6 +9,8 @@
 #include "FileAgent.h"
 #endif
 
+#include <algorithm>
+
 #include "FileAgentDoc.h"
 #include "FileAgentView.h"
 #include "FileAgentSocket.h"
@@ -154,6 +156,39 @@ void CFileAgentView::RenameItem(char* oldName, char* newName)
 void CFileAgentView::ClearItem()
 {
 	files.clear();
+}
+
+struct SortByNameAndAttribute
+{
+	inline bool operator() (const WIN32_FIND_DATA& struct1, const WIN32_FIND_DATA& struct2)
+	{
+		if (struct1.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY
+			&& (struct2.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
+		{
+			return true;
+		}
+		else if (struct2.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY
+			&& (struct1.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
+		{
+			return false;
+		}
+		else
+		{
+			if (StrCmpW(struct1.cFileName, struct2.cFileName) == 1)
+			{
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		}
+	}
+};
+
+void CFileAgentView::SortItemsByNameAndAttribute()
+{
+	std::sort(files.begin(), files.end(), SortByNameAndAttribute());
 }
 
 int CFileAgentView::GetItemSize()
