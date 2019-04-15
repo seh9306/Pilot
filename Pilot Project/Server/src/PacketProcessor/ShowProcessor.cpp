@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#define BUFSIZE 1024
+
 ShowProcessor::ShowProcessor()
 {
 }

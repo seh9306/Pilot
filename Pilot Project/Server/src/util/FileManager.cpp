@@ -31,7 +31,6 @@ DWORD FileManager::GetNumberOfDrives()
 
 std::list<WIN32_FIND_DATA>* FileManager::GetFileList(char *dir) 
 {
-	LARGE_INTEGER filesize;
 	WIN32_FIND_DATA FindFileData;
 	HANDLE hFind;
 	

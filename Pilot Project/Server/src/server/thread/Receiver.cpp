@@ -35,7 +35,7 @@ void Receiver::operator()(Server* server, HANDLE pComPort, std::vector<PacketPro
 			}
 
 			// distribute packet
-			if (packetProcessors.size() > perIoData->wsaBuf.buf[0]) {
+			if (packetProcessors.size() > (unsigned char)perIoData->wsaBuf.buf[0]) {
 				PacketProcessor *packetProcessor = packetProcessors.at(perIoData->wsaBuf.buf[0]);
 				// packet processing 
 				// according to each protocol number ( vector index )

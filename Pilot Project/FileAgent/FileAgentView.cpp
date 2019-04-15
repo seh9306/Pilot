@@ -146,7 +146,7 @@ void CFileAgentView::RenameItem(char* oldName, char* newName)
 		strcpy_s(temp, CT2A(file.cFileName));
 		if (!strcmp(temp, oldName))
 		{	
-			swprintf_s((wchar_t *)file.cFileName, MAX_PATH, L"%s", CString(newName));
+			swprintf_s((wchar_t *)file.cFileName, MAX_PATH, L"%s", T2W(CString(newName).GetBuffer()));
 			SetItemCountEx(listSize);	
 			break;
 		}
@@ -325,7 +325,7 @@ afx_msg void CFileAgentView::OnConeectBtnClicked()
 	portCEdit.GetWindowTextW(port);
 
 	strcpy_s(pCharIp, CT2A(ip));
-	_stscanf_s(port, _T("%u"), &uShortPort);
+	_stscanf_s(port, _T("%hu"), &uShortPort);
 
 	//WSAAsyncSelect(fileAgentSocket.GetSocket(), m_hWnd, 27001, FD_CONNECT);
 	fileAgentSocket->Connect(pCharIp, uShortPort);

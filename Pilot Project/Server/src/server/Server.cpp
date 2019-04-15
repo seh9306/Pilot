@@ -94,7 +94,7 @@ bool Server::Start()
 {
 	std::cout << "Start Network Explorer Server..." << std::endl;
 
-	for (int i = 0; i < systemInfo.dwNumberOfProcessors; i++)
+	for (unsigned int i = 0; i < systemInfo.dwNumberOfProcessors; i++)
 	{
 		Receiver receiver;
 		receiver.id = i;
