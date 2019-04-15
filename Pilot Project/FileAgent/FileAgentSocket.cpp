@@ -143,13 +143,13 @@ void FileAgentSocket::Connect(char *ipAddress, int port)
 
 	SendConnectionMessage();
 
-	perHandleData = (LPPER_HANDLE_DATA)malloc(sizeof(PER_HANDLE_DATA));
+	perHandleData = new PER_HANDLE_DATA;
 	perHandleData->hClntSock = fileAgentSocket;
 	memcpy(&(perHandleData->clntAddr), &fileAgentSocket, sizeof(fileAgentSocket));
 
 	CreateIoCompletionPort((HANDLE)fileAgentSocket, hCompletionPort, (DWORD)perHandleData, 0);
 
-	perIoData = (LPPER_IO_DATA)malloc(sizeof(PER_IO_DATA));
+	perIoData = new PER_IO_DATA;
 	memset(&(perIoData->overlapped), 0, sizeof(OVERLAPPED));
 	perIoData->wsaBuf.len = BUFSIZE;
 	perIoData->wsaBuf.buf = perIoData->buffer;

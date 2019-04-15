@@ -29,8 +29,8 @@ void Receiver::operator()(Server* server, HANDLE pComPort, std::vector<PacketPro
 				std::cout << "Out clnt";
 				server->clntInOut(-1);
 				closesocket(perHandleData->hClntSock);
-				free(perHandleData);
-				free(perIoData);
+				delete perHandleData;
+				delete perIoData;
 				continue;
 			}
 

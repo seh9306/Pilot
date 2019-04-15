@@ -113,13 +113,13 @@ bool Server::Start()
 		hClntSock = accept(hServSock, (SOCKADDR*)&clntAddr, &addrLen);
 		clntInOut(1);
 
-		perHandleData = (LPPER_HANDLE_DATA)malloc(sizeof(PER_HANDLE_DATA));
+		perHandleData = new PER_HANDLE_DATA;
 		perHandleData->hClntSock = hClntSock;
 		memcpy(&(perHandleData->clntAddr), &clntAddr, addrLen);
 
 		CreateIoCompletionPort((HANDLE)hClntSock, hCompletionPort, (DWORD)perHandleData, 0);
 
-		perIoData = (LPPER_IO_DATA)malloc(sizeof(PER_IO_DATA));
+		perIoData = new PER_IO_DATA;
 		memset(&(perIoData->overlapped), 0, sizeof(OVERLAPPED));
 		perIoData->wsaBuf.len = BUFSIZE;
 		perIoData->wsaBuf.buf = perIoData->buffer;

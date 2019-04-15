@@ -25,8 +25,8 @@ void Receiver::operator()(HANDLE pComPort, std::vector<PacketProcessor *> &packe
 				fileAgentSocket->CloseSocket();
 			}
 			//closesocket(perHandleData->hClntSock);
-			free(perHandleData);
-			free(perIoData);
+			delete perHandleData;
+			delete perIoData;
 			continue;
 		}
 		// decompress packet

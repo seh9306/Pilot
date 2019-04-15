@@ -23,7 +23,7 @@ PublishManager& PublishManager::GetInstance()
 
 LPPER_IO_DATA PublishManager::CreateData(char* msg, int size)
 {
-	LPPER_IO_DATA perIoData = (LPPER_IO_DATA)malloc(sizeof(PER_IO_DATA));
+	LPPER_IO_DATA perIoData = new PER_IO_DATA;
 
 	memset(&(perIoData->overlapped), 0, sizeof(OVERLAPPED));
 	perIoData->wsaBuf.len = size;
@@ -51,15 +51,6 @@ bool PublishManager::Publish(char * msg, std::list<SOCKET>& socks, int size)
 		{
 			if (WSAGetLastError() != WSA_IO_PENDING)
 				std::cout << "WSASend() error :: " << GetLastError() << std::endl;
-		}
-
-		if (WSASend(sock, &(perIoData->wsaBuf), 1,
-			nullptr, 0, NULL, nullptr) == SOCKET_ERROR)
-		{
-			if (WSAGetLastError() != WSA_IO_PENDING)
-			{
-				std::cout << "WSASend() error :: " << GetLastError() << std::endl;
-			}
 		}
 	}
 	return true;

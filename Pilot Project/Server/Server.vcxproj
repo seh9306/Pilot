@@ -69,7 +69,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Program Files %28x86%29\Windows Kits\10\Include\10.0.10150.0\ucrt;C:\Users\Park\Desktop\조롱이\Pilot Project\Server\src;C:\Users\Park\Desktop\Pilot Proejct ver2\Pilot Project\Server\src;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Program Files %28x86%29\Windows Kits\10\Include\10.0.10150.0\ucrt;C:\Users\Park\Desktop\조롱이\Pilot Project\Server\src;C:\Users\Park\Desktop\Pilot Project ver3\seh9306\Pilot Project\Server\src;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(SolutionDir)\Server\src;$(IncludePath)</IncludePath>
