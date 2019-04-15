@@ -186,7 +186,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="ConnectProcessor.h" />
-    <ClInclude Include="CreateProcessor.h" />
+    <ClInclude Include="CopyProcessor.h" />
     <ClInclude Include="DeleteProcessor.h" />
     <ClInclude Include="FileAgent.h" />
     <ClInclude Include="FileAgentDoc.h" />
@@ -207,7 +207,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ConnectProcessor.cpp" />
-    <ClCompile Include="CreateProcessor.cpp" />
+    <ClCompile Include="CopyProcessor.cpp" />
     <ClCompile Include="DeleteProcessor.cpp" />
     <ClCompile Include="FileAgent.cpp" />
     <ClCompile Include="FileAgentDoc.cpp" />

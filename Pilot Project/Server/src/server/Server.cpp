@@ -13,7 +13,7 @@
 #include "PacketProcessor/UnSubscribeProcessor.h"
 #include "PacketProcessor/ShowProcessor.h"
 // ShowAddProcessor.h
-#include "PacketProcessor/CreateProcessor.h"
+#include "PacketProcessor/CopyProcessor.h"
 #include "PacketProcessor/RenameProcessor.h"
 #include "PacketProcessor/DeleteProcessor.h"
 #include "PacketProcessor/MoveProcessor.h"
@@ -76,7 +76,7 @@ bool Server::Init()
 	packetProcessors.push_back(new UnSubscribeProcessor());
 	packetProcessors.push_back(new ShowProcessor());
 	packetProcessors.push_back(nullptr); // ShowAdd
-	packetProcessors.push_back(new CreateProcessor());
+	packetProcessors.push_back(new CopyProcessor());
 	packetProcessors.push_back(new RenameProcessor());
 	packetProcessors.push_back(new DeleteProcessor());
 	packetProcessors.push_back(new MoveProcessor());

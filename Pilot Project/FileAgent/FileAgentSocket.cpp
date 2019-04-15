@@ -5,7 +5,7 @@
 #include "SubscribeProcessor.h"
 #include "ShowProcessor.h"
 #include "ShowAddProcessor.h"
-#include "CreateProcessor.h"
+#include "CopyProcessor.h"
 #include "RenameProcessor.h"
 #include "DeleteProcessor.h"
 #include "MoveProcessor.h"
@@ -29,7 +29,7 @@ FileAgentSocket::FileAgentSocket()
 	packetProcessors.push_back(nullptr); // UnSubscribe
 	packetProcessors.push_back(new ShowProcessor());
 	packetProcessors.push_back(new ShowAddProcessor());
-	packetProcessors.push_back(new CreateProcessor());
+	packetProcessors.push_back(new CopyProcessor());
 	packetProcessors.push_back(new RenameProcessor());
 	packetProcessors.push_back(new DeleteProcessor());
 	packetProcessors.push_back(new MoveProcessor());

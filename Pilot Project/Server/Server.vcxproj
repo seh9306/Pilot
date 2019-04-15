@@ -124,7 +124,7 @@
     <ClCompile Include="src\Error\ErrorHandle.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\PacketProcessor\ConnectProcessor.cpp" />
-    <ClCompile Include="src\PacketProcessor\CreateProcessor.cpp" />
+    <ClCompile Include="src\PacketProcessor\CopyProcessor.cpp" />
     <ClCompile Include="src\PacketProcessor\DeleteProcessor.cpp" />
     <ClCompile Include="src\PacketProcessor\MoveProcessor.cpp" />
     <ClCompile Include="src\PacketProcessor\PacketProcessor.cpp" />
@@ -140,7 +140,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\PacketProcessor\ConnectProcessor.h" />
-    <ClInclude Include="src\PacketProcessor\CreateProcessor.h" />
+    <ClInclude Include="src\PacketProcessor\CopyProcessor.h" />
     <ClInclude Include="src\PacketProcessor\DeleteProcessor.h" />
     <ClInclude Include="src\PacketProcessor\MoveProcessor.h" />
     <ClInclude Include="src\PacketProcessor\PacketProcessor.h" />

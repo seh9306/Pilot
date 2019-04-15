@@ -1,13 +1,13 @@
-#ifndef CREATEPROCESSOR_H
-#define CREATEPROCESSOR_H
+#ifndef COPYPROCESSOR_H
+#define COPYPROCESSOR_H
 
 #include "PacketProcessor.h"
-class CreateProcessor :
+class CopyProcessor :
 	public PacketProcessor
 {
 public:
-	CreateProcessor();
-	~CreateProcessor();
+	CopyProcessor();
+	~CopyProcessor();
 
 	void PacketProcess(SOCKET sock, char *msg);
 };

@@ -30,11 +30,11 @@ enum protocolType {
 	kUnSubscribe = 1,
 	kShow,
 	kShowAdd,
-	kCreate,
+	kCopy,
 	kRename,
 	kDelete,
 	kMove,
-	kConnect
+	kConnect	
 };
 
 class PacketProcessor

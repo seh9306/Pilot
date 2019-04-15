@@ -75,13 +75,13 @@
     <ClInclude Include="MoveProcessor.h">
       <Filter>src\PacketProcessor</Filter>
     </ClInclude>
-    <ClInclude Include="CreateProcessor.h">
-      <Filter>src\PacketProcessor</Filter>
-    </ClInclude>
     <ClInclude Include="RenameProcessor.h">
       <Filter>src\PacketProcessor</Filter>
     </ClInclude>
     <ClInclude Include="ConnectProcessor.h">
+      <Filter>src\PacketProcessor</Filter>
+    </ClInclude>
+    <ClInclude Include="CopyProcessor.h">
       <Filter>src\PacketProcessor</Filter>
     </ClInclude>
   </ItemGroup>
@@ -122,9 +122,6 @@
     <ClCompile Include="MoveProcessor.cpp">
       <Filter>src\PacketProcessor</Filter>
     </ClCompile>
-    <ClCompile Include="CreateProcessor.cpp">
-      <Filter>src\PacketProcessor</Filter>
-    </ClCompile>
     <ClCompile Include="RenameProcessor.cpp">
       <Filter>src\PacketProcessor</Filter>
     </ClCompile>
@@ -132,6 +129,9 @@
       <Filter>src\PacketProcessor</Filter>
     </ClCompile>
     <ClCompile Include="ConnectProcessor.cpp">
+      <Filter>src\PacketProcessor</Filter>
+    </ClCompile>
+    <ClCompile Include="CopyProcessor.cpp">
       <Filter>src\PacketProcessor</Filter>
     </ClCompile>
   </ItemGroup>
