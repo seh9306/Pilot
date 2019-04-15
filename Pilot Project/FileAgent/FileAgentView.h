@@ -132,6 +132,7 @@ private:
 	int fixedDateColumnPos = 1;
 	int madeDateColumnPos = 2;
 	int attributeDateColumnPos = 3;
+	int fileSizeColumnPos = 4;
 
 	CString ip;
 	CString port;

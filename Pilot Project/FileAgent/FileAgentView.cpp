@@ -266,16 +266,19 @@ int CFileAgentView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	// setting column name
 	stringTableValue.LoadStringW(FILE_CLIENT_COLUMN_NAME);
-	fileCListCtrl.InsertColumn(0, stringTableValue, LVCF_TEXT, 150);
+	fileCListCtrl.InsertColumn(nameColumnPos, stringTableValue, LVCF_TEXT, 200);
 
 	stringTableValue.LoadStringW(FILE_CLIENT_COLUMN_FIXED_DATE);
-	fileCListCtrl.InsertColumn(1, stringTableValue, LVCF_TEXT, 130);
+	fileCListCtrl.InsertColumn(fixedDateColumnPos, stringTableValue, LVCF_TEXT, 130);
 
 	stringTableValue.LoadStringW(FILE_CLIENT_COLUMN_MADE_DATE);
-	fileCListCtrl.InsertColumn(2, stringTableValue, LVCF_TEXT, 130);
+	fileCListCtrl.InsertColumn(madeDateColumnPos, stringTableValue, LVCF_TEXT, 130);
 
 	stringTableValue.LoadStringW(FILE_CLIENT_COLUMN_ATTRIBUTE);
-	fileCListCtrl.InsertColumn(3, stringTableValue, LVCF_TEXT, 130);
+	fileCListCtrl.InsertColumn(attributeDateColumnPos, stringTableValue, LVCF_TEXT, 130);
+
+	stringTableValue.LoadStringW(FILE_CLIENT_COLUMN_FILE_SIZE);
+	fileCListCtrl.InsertColumn(fileSizeColumnPos, stringTableValue, LVCF_TEXT | LVCFMT_RIGHT, 130);
 
 
 	stringTableValue.LoadStringW(FILE_CLIENT_IP_LABEL);
@@ -657,7 +660,7 @@ void makeTime(char *buf, FILETIME& fileTime)
 		systemTime.wYear, systemTime.wMonth, systemTime.wDay,
 		systemTime.wHour, systemTime.wMinute, systemTime.wSecond);
 }
-
+#include <iostream>
 void CFileAgentView::OnLvnGetdispinfoList(NMHDR * pNMHDR, LRESULT * pResult)
 {
 	LV_DISPINFO* pDispInfo = (LV_DISPINFO*)pNMHDR;
@@ -671,28 +674,43 @@ void CFileAgentView::OnLvnGetdispinfoList(NMHDR * pNMHDR, LRESULT * pResult)
 
 		if (pItem->iSubItem == nameColumnPos)
 		{
-			//Text is name
 			text = CString(files[itemid].cFileName);
 		}
 		else if (pItem->iSubItem == fixedDateColumnPos)
 		{
-			//Text is slogan
 			char buffer[100];
 			makeTime(buffer, files[itemid].ftLastWriteTime);
 			text = CString(buffer);
 		}
 		else if (pItem->iSubItem == madeDateColumnPos)
 		{
-			//Text is slogan
 			char buffer[100];
 			makeTime(buffer, files[itemid].ftCreationTime);
 			text = CString(buffer);
 		}
 		else if (pItem->iSubItem == attributeDateColumnPos)
 		{
-			//Text is slogan
-			text.Format(TEXT("%u"), files[itemid].dwFileAttributes);
+			if (files[itemid].dwFileAttributes & 16)
+			{ // 폴더
+				text.Format(TEXT("%d"), files[itemid].dwFileAttributes);
+			}
+			else
+			{
+				text.Format(TEXT("%u"), files[itemid].dwFileAttributes);
+			}
 
+		}
+		else if (pItem->iSubItem == fileSizeColumnPos)
+		{
+			ULONGLONG fileSize = (static_cast<ULONGLONG>(files[itemid].nFileSizeHigh) <<
+				sizeof(files[itemid].nFileSizeLow) * 8) |
+				files[itemid].nFileSizeLow;
+
+			if(fileSize)
+			{
+				text.Format(TEXT("%lluKB"), fileSize /1024);
+			}
+			
 		}
 
 		//Copy the text to the LV_ITEM structure
