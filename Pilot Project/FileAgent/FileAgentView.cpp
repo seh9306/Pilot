@@ -280,7 +280,6 @@ int CFileAgentView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	stringTableValue.LoadStringW(FILE_CLIENT_COLUMN_FILE_SIZE);
 	fileCListCtrl.InsertColumn(fileSizeColumnPos, stringTableValue, LVCF_TEXT | LVCFMT_RIGHT, 130);
 
-
 	stringTableValue.LoadStringW(FILE_CLIENT_IP_LABEL);
 	iPAddresscStatic.Create(stringTableValue, WS_VISIBLE, CRect(0, 0, 30, 20), this, IPADDRESSCEDIT_ID);
 	iPAddressCEdit.Create(WS_BORDER | WS_VISIBLE, CRect(30, 0, 150, 20), this, IPADDRESSSTATIC_ID);
@@ -320,6 +319,7 @@ afx_msg void CFileAgentView::OnConeectBtnClicked()
 {
 	SetItemCountEx(0);
 	files.clear();
+	fileCTreeCtrl.DeleteAllItems();
 
 	FileAgentSocket *fileAgentSocket = FileAgentSocket::GetInstance();
 	
