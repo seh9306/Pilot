@@ -12,7 +12,7 @@ void Receiver::operator()(HANDLE pComPort, std::vector<PacketProcessor *> &packe
 	{
 		GetQueuedCompletionStatus(hCompletionPort,
 			&bytesTransferred,
-			(LPDWORD)&perHandleData,
+			(PULONG_PTR)&perHandleData,
 			(LPOVERLAPPED*)&perIoData,
 			INFINITE
 		);

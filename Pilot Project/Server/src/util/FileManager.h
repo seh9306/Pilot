@@ -8,13 +8,16 @@ class FileManager
 {
 public:
 	~FileManager();
+
 	static FileManager& GetInstance();
-	wchar_t * GetLogicalDriveStringsW();
-	DWORD GetNumberOfDrives();
-	std::list<WIN32_FIND_DATA>* GetFileList(char* dir);
+
 	bool DeleteFileByFileName(char* dir, char* fileName, char type);
-	bool Rename(char* dir, char* oldName, char* newName);
+	std::list<WIN32_FIND_DATA>* GetFileList(char* dir);
+	wchar_t* GetLogicalDriveStringsW();
+	DWORD GetNumberOfDrives();
 	bool Move(char* dir, char* oldName, char* newName);
+	bool Rename(char* dir, char* oldName, char* newName);
+
 private:
 	FileManager();
 	wchar_t logicalDriveStrings[40];

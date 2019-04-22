@@ -374,7 +374,7 @@ void CFileAgentView::OnItemDblclked(NMHDR * pNMHDR, LRESULT * pResult)
 	sIndexValue = fileCListCtrl.GetItemText(itemid, 0);
 	attr = fileCListCtrl.GetItemText(itemid, 3);
 	
-	if ((DWORD)_ttoi((LPCTSTR)attr) & FILE_ATTRIBUTE_DIRECTORY && sIndexValue != CString("."))
+	if (((DWORD)_ttoi((LPCTSTR)attr) & FILE_ATTRIBUTE_DIRECTORY) && (sIndexValue != CString(".")))
 	{
 		FileAgentSocket *fileAgentSocket = FileAgentSocket::GetInstance();
 		fileAgentSocket->UnSubscribe(pCharDir);
@@ -400,7 +400,7 @@ void CFileAgentView::OnItemDblclked(NMHDR * pNMHDR, LRESULT * pResult)
 			dir += sIndexValue + CString("\\");
 		}
 		
-		dirCEdit.SetWindowTextW(dir);
+		dirCEdit.SetWindowText(dir);
 		strcpy_s(pCharDir, CT2A(dir));
 		fileAgentSocket->Subscribe(pCharDir);
 	}
@@ -414,7 +414,7 @@ void CFileAgentView::DeleteFileRequest()
 
 	strcpy_s(pFileName, CT2A(fileCListCtrl.GetItemText(nItem, 0)));
 
-	char attribute = _ttoi(fileCListCtrl.GetItemText(nItem, 3)) & 16;
+	char attribute = _ttoi(fileCListCtrl.GetItemText(nItem, 3)) & FILE_ATTRIBUTE_DIRECTORY;
 
 	FileAgentSocket *fileAgentSocket = FileAgentSocket::GetInstance();
 	fileAgentSocket->Delete(pCharDir, pFileName, attribute);

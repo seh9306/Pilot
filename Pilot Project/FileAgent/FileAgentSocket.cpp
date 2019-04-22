@@ -12,6 +12,7 @@
 #include "ConnectProcessor.h"
 
 #include "Receiver.h"
+#include "Resource.h"
 #include <thread>
 
 FileAgentSocket *FileAgentSocket::fileAgent = nullptr;
@@ -255,6 +256,10 @@ void FileAgentSocket::Show(char* dir, DWORD showNumber)
 		if (WSAGetLastError() != WSA_IO_PENDING)
 		{
 			TRACE("error");
+		}
+		else
+		{
+			printf("보내야지?\n");
 		}
 	}
 

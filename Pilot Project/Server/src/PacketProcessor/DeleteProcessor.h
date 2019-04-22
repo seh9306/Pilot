@@ -10,7 +10,7 @@ public:
 	DeleteProcessor();
 	~DeleteProcessor();
 
-	void PacketProcess(SOCKET sock, char *msg);
+	void ProcessPacket(SOCKET sock, char *msg);
 };
 
 #endif

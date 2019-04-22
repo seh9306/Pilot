@@ -11,21 +11,17 @@ RenameProcessor::~RenameProcessor()
 {
 }
 
-void RenameProcessor::PacketProcess(SOCKET sock, char * msg)
+void RenameProcessor::ProcessPacket(SOCKET sock, char * msg)
 {
-	int dirLength		= 0;
-	int oldFileLength	= 0;
-	int newFileLength	= 0;
+	uint32_t dirLength		= 0;
+	uint32_t oldFileLength	= 0;
+	uint32_t newFileLength	= 0;
 
-	int byteOffset = 0 + PROTOCOL_TYPE_SIZE;
+	int offset = 0 + PROTOCOL_TYPE_SIZE;
 
-	memcpy(&dirLength, msg + byteOffset, sizeof(int));
-	byteOffset += sizeof(int) + dirLength;
-
-	memcpy(&oldFileLength, msg + byteOffset, sizeof(int));
-	byteOffset += sizeof(int) + oldFileLength;
-
-	memcpy(&newFileLength, msg + byteOffset, sizeof(int));
+	ReadLengthWithAddingLengthAndSize(&dirLength, msg, sizeof(dirLength), offset);
+	ReadLengthWithAddingLengthAndSize(&oldFileLength, msg, sizeof(dirLength), offset);
+	ReadLength(&newFileLength, msg, sizeof(dirLength), offset);
 
 	if (!msg || dirLength + oldFileLength + newFileLength > 
 		RENAME_HEADER_SIZE + MAX_PATH * 3 + NULL_VALUE_SIZE * 3) // MAX_PATH 260..
@@ -34,14 +30,15 @@ void RenameProcessor::PacketProcess(SOCKET sock, char * msg)
 	}
 
 	// File rename
-	byteOffset = 0 + PROTOCOL_TYPE_SIZE + sizeof(int);
-	char* pDir = msg + byteOffset;
+	offset = 0 + PROTOCOL_TYPE_SIZE + sizeof(int);
 
-	byteOffset += dirLength + sizeof(int);
-	char* pOldFile = msg + byteOffset;
+	char* pDir = msg + offset;
+	offset += dirLength + sizeof(int);
 
-	byteOffset += oldFileLength + sizeof(int);
-	char* pNewFile = msg + byteOffset;
+	char* pOldFile = msg + offset;
+	offset += oldFileLength + sizeof(int);
+
+	char* pNewFile = msg + offset;
 
 	if (!fileManager->Rename(pDir, pOldFile, pNewFile))
 	{

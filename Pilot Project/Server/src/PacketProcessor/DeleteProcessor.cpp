@@ -10,12 +10,12 @@ DeleteProcessor::~DeleteProcessor()
 {
 }
 
-void DeleteProcessor::PacketProcess(SOCKET sock, char* msg)
+void DeleteProcessor::ProcessPacket(SOCKET sock, char* msg)
 {
-	int dirLength		= 0;
-	int fileNameLength	= 0;
+	uint32_t dirLength = 0;
+	uint32_t fileNameLength	= 0;
 
-	int byteOffset = PROTOCOL_TYPE_SIZE + FILE_TYPE_SIZE;
+	int offset = PROTOCOL_TYPE_SIZE + FILE_TYPE_SIZE;
 
 	if (msg[FILE_TYPE_INDEX] != FILE_TYPE_NORMAL 
 		&& msg[FILE_TYPE_INDEX] != FILE_TYPE_DIRECTORY)
@@ -23,12 +23,10 @@ void DeleteProcessor::PacketProcess(SOCKET sock, char* msg)
 		return;
 	}
 
-	char fileType = msg[1];
+	char fileType = msg[FILE_TYPE_INDEX];
 
-	memcpy(&dirLength, msg + byteOffset, sizeof(int));
-	byteOffset += sizeof(int);
-
-	memcpy(&fileNameLength, msg + byteOffset + dirLength, sizeof(int));
+	ReadLengthWithAddingLengthAndSize(&dirLength, msg, sizeof(dirLength), offset);
+	ReadLength(&fileNameLength, msg, sizeof(fileNameLength), offset);
 
 	if (!msg || dirLength + fileNameLength > DELETE_HEADER_SIZE + MAX_PATH * 2 + NULL_VALUE_SIZE * 2) // MAX_PATH 260..
 	{
@@ -36,8 +34,12 @@ void DeleteProcessor::PacketProcess(SOCKET sock, char* msg)
 	}
 
 	// File delete
-	char* pDir	= msg + PROTOCOL_TYPE_SIZE + FILE_TYPE_SIZE + sizeof(int);
-	char* pFile = msg + PROTOCOL_TYPE_SIZE + FILE_TYPE_SIZE + sizeof(int) + dirLength + sizeof(int);
+	offset = 0 + +PROTOCOL_TYPE_SIZE + FILE_TYPE_SIZE + sizeof(dirLength);
+
+	char* pDir = msg + offset;
+	offset += +dirLength + sizeof(fileNameLength);
+
+	char* pFile = msg + offset;
 
 	if (!fileManager->DeleteFileByFileName(pDir, pFile, fileType))
 	{
@@ -52,9 +54,9 @@ void DeleteProcessor::PacketProcess(SOCKET sock, char* msg)
 	{
 		publishManager->Publish(msg, *sockets, PROTOCOL_TYPE_SIZE 
 			+ FILE_TYPE_SIZE 
-			+ sizeof(int) 
+			+ sizeof(dirLength)
 			+ dirLength 
-			+ sizeof(int) 
+			+ sizeof(fileNameLength)
 			+ fileNameLength
 		);
 	}

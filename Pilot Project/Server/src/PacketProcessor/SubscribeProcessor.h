@@ -3,7 +3,8 @@
 
 #include "PacketProcessor.h"
 
-#define SUCCESS_SUBSCRIBE_INDEX 1
+const int kSuccessSubscribeIndex = 1;
+const int kSuccessSubscribeIndexSize = 1;
 
 class SubscribeProcessor :
 	public PacketProcessor
@@ -11,7 +12,7 @@ class SubscribeProcessor :
 public:
 	SubscribeProcessor();
 	virtual ~SubscribeProcessor();
-	virtual void PacketProcess(SOCKET sock, char *msg);
+	virtual void ProcessPacket(SOCKET sock, char *msg);
 };
 
 #endif

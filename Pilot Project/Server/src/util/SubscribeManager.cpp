@@ -2,19 +2,13 @@
 
 #include <iostream>
 
+
 SubscribeManager::SubscribeManager()
 {
 }
 
 SubscribeManager::~SubscribeManager()
 {
-	// @issue
-	auto it = sockets.begin();
-
-	for (; it != sockets.end(); it++)
-	{
-		delete it->second;
-	}
 }
 
 SubscribeManager& SubscribeManager::GetInstance() 
@@ -37,12 +31,48 @@ bool SubscribeManager::Subscribe(char *dir, SOCKET sock)
 	else 
 	{
 		// new operator
-		std::list<SOCKET> *temp = new std::list<SOCKET>();
-		temp->push_back(sock);
-		sockets.insert({ dirString, temp });
+		std::list<SOCKET> *socketsPerDir = new std::list<SOCKET>();
+		socketsPerDir->push_back(sock);
+
+		std::unique_ptr<std::list<SOCKET>> pList(std::move(socketsPerDir));
+		
+		sockets.insert({ dirString, std::move(pList) });
 	}
 
 	dirs.insert({ sock, dirString });
+
+	return true;
+}
+
+bool SubscribeManager::UnSubscribe(SOCKET clientSocket)
+{
+	std::string dirString = GetDirBySocket(clientSocket);
+
+	auto search = sockets.find(dirString);
+
+	if (search != sockets.end())
+	{
+		if (search->second == nullptr)
+		{
+			return false;
+		}
+		
+		auto it = search->second->begin();
+
+		for (; it != search->second->end(); it++)
+		{
+			SOCKET s = *it;
+			if (s == clientSocket)
+			{
+				search->second->erase(it);
+				break;
+			}
+		}
+	}
+	else
+	{
+		return false;
+	}
 
 	return true;
 }
@@ -55,19 +85,18 @@ bool SubscribeManager::UnSubscribe(char * dir, SOCKET sock)
 
 	if (search != sockets.end())
 	{
-		std::list<SOCKET>* temp = search->second;
-		if (temp == nullptr)
+		if (search->second == nullptr)
 		{
 			return false;
 		}
-		auto it = temp->begin();
+		auto it = search->second->begin();
 		
-		for (;it != temp->end(); it++)
+		for (;it != search->second->end(); it++)
 		{
 			SOCKET s = *it;
 			if (s == sock) 
 			{
-				temp->erase(it);
+				search->second->erase(it);
 				break;
 			}
 		}
@@ -88,7 +117,7 @@ std::list<SOCKET> *SubscribeManager::GetSocketsByDir(char *dir)
 
 	if (search != sockets.end()) 
 	{
-		return search->second;
+		return search->second.get();
 	}
 
 	return nullptr;
@@ -103,5 +132,5 @@ std::string SubscribeManager::GetDirBySocket(SOCKET sock)
 		return search->second;
 	}
 
-	return nullptr;
+	return std::string("");
 }

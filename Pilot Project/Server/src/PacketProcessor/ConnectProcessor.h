@@ -9,7 +9,10 @@ class ConnectProcessor :
 public:
 	ConnectProcessor();
 	virtual ~ConnectProcessor();
-	void PacketProcess(SOCKET sock, char *msg); //1
+	void ProcessPacket(SOCKET sock, char *msg); //1
+
+private:
+	const int driverStringLength = 4;
 };
 
 #endif

@@ -7,65 +7,79 @@
 #include <iostream>
 #include <string>
 
-void Receiver::operator()(Server* server, HANDLE pComPort, std::vector<PacketProcessor *> &packetProcessors)
+void Receiver::operator()(Server* server,
+		HANDLE completionPort,
+		std::vector<std::unique_ptr<PacketProcessor>>* packetProcessors)
 {
-	hCompletionPort = pComPort;
 	SubscribeManager& subcribeManager = SubscribeManager::GetInstance();
+	
+	AsyncIOBuffer* asyncIOBuffer;
+	SocketDataPerClient* socketDataPerClient = 0;
+	
+	DWORD bytesTransferred = 0;
+	DWORD flags = 0;
+
 	while (true) 
 	{
-		GetQueuedCompletionStatus(hCompletionPort,
+		GetQueuedCompletionStatus(completionPort,
 			&bytesTransferred,
-			(LPDWORD)&perHandleData,
-			(LPOVERLAPPED*)&perIoData,
+			(PULONG_PTR)&socketDataPerClient,
+			(LPOVERLAPPED*)&asyncIOBuffer,
 			INFINITE
 		);
 
-		if (perIoData->type == IOCP_ASYNC_RECV)
+		if (bytesTransferred == 0)
 		{
-			if (bytesTransferred == 0)
+			subcribeManager.UnSubscribe(socketDataPerClient->clientSocket);
+			// TODO : 클라이언트 수 감소
+			closesocket(socketDataPerClient->clientSocket);
+			delete socketDataPerClient;
+			// 전달하고 있는 데이터를 할당해제일 가능성
+			if (asyncIOBuffer != nullptr)
 			{
-				std::string temp = subcribeManager.GetDirBySocket(perHandleData->hClntSock);
-				subcribeManager.UnSubscribe((char *)temp.c_str(), perHandleData->hClntSock);
-				std::cout << "Out clnt";
-				server->clntInOut(-1);
-				closesocket(perHandleData->hClntSock);
-				delete perHandleData;
-				delete perIoData;
-				continue;
+				delete asyncIOBuffer;
 			}
-
+			continue;
+		}
+		
+		if (asyncIOBuffer->type == IOCP_ASYNC_RECV)
+		{
 			// distribute packet
-			if (packetProcessors.size() > (unsigned char)perIoData->wsaBuf.buf[0]) {
-				PacketProcessor *packetProcessor = packetProcessors.at(perIoData->wsaBuf.buf[0]);
-				// packet processing 
-				// according to each protocol number ( vector index )
-				packetProcessor->PacketProcess(perHandleData->hClntSock,
-					perIoData->wsaBuf.buf);
+			int index = asyncIOBuffer->wsaBuf.buf[0];
+			if (packetProcessors->size() > index) {
+				PacketProcessor *packetProcessor = packetProcessors->at(index).get();
+				if (packetProcessor != nullptr)
+				{
+					// packet processing 
+					// according to each protocol number ( vector index )
+					packetProcessor->ProcessPacket(socketDataPerClient->clientSocket,
+						asyncIOBuffer->wsaBuf.buf);
+				}
+				else
+				{
+					printf("index %d is nullptr \n",index);
+				}
 			}
 			else {
 				std::cout << "no packet processor" << std::endl;
 			}
 
-			memset(&(perIoData->overlapped), 0, sizeof(OVERLAPPED));
-			perIoData->wsaBuf.len = BUFSIZE;
-			perIoData->wsaBuf.buf = perIoData->buffer;
+			memset(&(asyncIOBuffer->overlapped), 0, sizeof(OVERLAPPED));
 
-			flags = 0;
-
-			WSARecv(perHandleData->hClntSock,
-				&(perIoData->wsaBuf),
+			WSARecv(socketDataPerClient->clientSocket,
+				&(asyncIOBuffer->wsaBuf),
 				1,
 				nullptr,
 				&flags,
-				&(perIoData->overlapped),
+				&(asyncIOBuffer->overlapped),
 				nullptr
 			);
-		}
-		else if (perIoData->type == IOCP_ASYNC_SEND)
-		{
-			delete perIoData;
-		}
 
+		}
+		else if (asyncIOBuffer->type == IOCP_ASYNC_SEND)
+		{
+			delete asyncIOBuffer;
+		}
 	}
 
 }

@@ -7,26 +7,6 @@
 
 #include <vector>
 
-#define FILE_CLIENT_COLUMN_NAME				101
-#define FILE_CLIENT_COLUMN_FIXED_DATE		102
-#define FILE_CLIENT_COLUMN_MADE_DATE		103
-#define FILE_CLIENT_COLUMN_ATTRIBUTE		104
-
-#define FILE_CLIENT_CONNECT_BUTTON			105
-#define FILE_CLIENT_EXPLORE_BUTTON			106
-
-#define FILE_CLIENT_DEFAULT_DIR				107
-#define FILE_CLIENT_DEFAULT_PORT			108
-#define FILE_CLIENT_DEFAULT_IP				109
-
-#define FILE_CLIENT_PORT_LABEL				110
-#define FILE_CLIENT_IP_LABEL				111
-#define FILE_CLIENT_DIR_LABEL				112
-
-#define FILE_CLIENT_NOT_CONNECTED			113
-#define FILE_CLIENT_CONNECT_FAIL			114
-#define FILE_CLIENT_CONNECT_SUCCESS			115
-
 #define CONNECTBTN_ID 26001
 #define PORTCEDIT_ID 26002
 #define PORTSTATIC_ID 26003
@@ -121,7 +101,7 @@ public:
 	afx_msg void OnLvnGetdispinfoList(NMHDR *pNMHDR, LRESULT *pResult);
 
 private:
-	bool        bDrag = false;        
+	bool bDrag = false;        
 	int         nOldTarget = -1;   
 	int         nSource = -1;      
 

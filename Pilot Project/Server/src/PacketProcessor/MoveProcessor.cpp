@@ -10,39 +10,35 @@ MoveProcessor::~MoveProcessor()
 {
 }
 
-void MoveProcessor::PacketProcess(SOCKET sock, char * msg)
+void MoveProcessor::ProcessPacket(SOCKET sock, char * msg)
 {
-	int dirLength		= 0;
-	int fileNameLength	= 0;
-	int goalLength		= 0;
+	uint32_t dirLength		= 0;
+	uint32_t fileNameLength	= 0;
+	uint32_t goalLength		= 0;
 	
-	int byteOffset = 0 + PROTOCOL_TYPE_SIZE;
+	int offset = 0 + PROTOCOL_TYPE_SIZE;
 
-	memcpy(&dirLength, msg + byteOffset, sizeof(int));
-	byteOffset += sizeof(int) + dirLength;
-
-	memcpy(&fileNameLength, msg + byteOffset, sizeof(int));
-	byteOffset += sizeof(int) + fileNameLength;
-
-	memcpy(&goalLength, msg + byteOffset, sizeof(int));
+	ReadLengthWithAddingLengthAndSize(&dirLength, msg, sizeof(dirLength), offset);
+	ReadLengthWithAddingLengthAndSize(&fileNameLength, msg, sizeof(fileNameLength), offset);
+	ReadLength(&goalLength, msg, sizeof(goalLength), offset);
 
 	if (!msg || dirLength + fileNameLength + goalLength>
-		MOVE_HEADER_SIZE + MAX_PATH * 3 + NULL_VALUE_SIZE * 3) // MAX_PATH 260..
+		MOVE_HEADER_SIZE + MAX_PATH + NULL_VALUE_SIZE * 3) // MAX_PATH 260..
 	{
 		return;
 	}
 
 	// File move
-	byteOffset = 0 + PROTOCOL_TYPE_SIZE + sizeof(int);
-	char* pDir = msg + byteOffset;
+	offset = 0 + PROTOCOL_TYPE_SIZE + sizeof(int);
 
-	byteOffset += dirLength + sizeof(int);
-	char* pFileName = msg + byteOffset;
+	char* pDir = msg + offset;
+	offset += dirLength + sizeof(int);
 
-	byteOffset += fileNameLength + sizeof(int);
-	char* pNewFileDir = msg + byteOffset;
+	char* pFileName = msg + offset;
+	offset += fileNameLength + sizeof(int);
 
-	byteOffset += goalLength;
+	char* pNewFileDir = msg + offset;
+	offset += goalLength;
 
 	if (!fileManager->Move(pDir, pFileName, pNewFileDir))
 	{
@@ -53,7 +49,7 @@ void MoveProcessor::PacketProcess(SOCKET sock, char * msg)
 	// Publish
 	std::list<SOCKET>* sockets = subscribeManager->GetSocketsByDir(pDir);
 
-	byteOffset += sizeof(WIN32_FIND_DATA);
+	offset += sizeof(WIN32_FIND_DATA);
 
 	if (sockets != nullptr)
 	{
@@ -63,6 +59,6 @@ void MoveProcessor::PacketProcess(SOCKET sock, char * msg)
 	sockets = subscribeManager->GetSocketsByDir(pNewFileDir);
 	if(sockets != nullptr)
 	{
-		publishManager->Publish(msg, *sockets, byteOffset);
+		publishManager->Publish(msg, *sockets, offset);
 	}
 }

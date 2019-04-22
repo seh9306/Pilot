@@ -3,14 +3,18 @@
 
 #pragma comment(lib, "ws2_32.lib")
 
-#include <WinSock2.h>
+#include <atomic>
+#include <memory>
 #include <vector>
+#include <WinSock2.h>
 
 #include "NetworkData.h"
 
-enum InitErrors {
-	kBindError = 0,
-	kListenError = 1
+enum InitErrors
+{
+	kSuccess = 0,
+	kBindError = 1,
+	kListenError = 2
 };
 
 class PacketProcessor;
@@ -20,28 +24,21 @@ class Server
 public:
 	Server();
 	~Server();
-	bool Init();
-	bool Start();
-	void clntInOut(int count);
+	int Init(int port = 9030);
+	int Start();
+	void AddProcessor(PacketProcessor* packetProcessor);
+
 private:
-	int port;
-	WSADATA wsaData; // Window Socket API Data
-	HANDLE hCompletionPort; // Handle of Completion Port
-	SYSTEM_INFO systemInfo; // For number of cpu Proc
-	SOCKADDR_IN servAddr; // Server Address
-	LPPER_IO_DATA perIoData; 
-	LPPER_HANDLE_DATA perHandleData; // Socket Handle data
+	std::atomic_uint32_t numberOfClient_;
+
+	// Handle of Completion Port
+	HANDLE hCompletionPort_;
 
 	// Handle Server Socket
-	SOCKET hServSock; 
-	DWORD recvBytes;
-	DWORD flags;
-
-	int numberOfClient = 0;
-	CRITICAL_SECTION criticalSection;
+	SOCKET serverSocket_; 
 
 	// Create Processor vector
-	std::vector<PacketProcessor *> packetProcessors;
+	std::vector<std::unique_ptr<PacketProcessor>> packetProcessors_;
 };
 
 #endif

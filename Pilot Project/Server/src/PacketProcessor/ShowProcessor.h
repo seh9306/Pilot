@@ -9,7 +9,7 @@ class ShowProcessor :
 public:
 	ShowProcessor();
 	virtual ~ShowProcessor();
-	virtual void PacketProcess(SOCKET sock, char *msg);
+	virtual void ProcessPacket(SOCKET sock, char *msg);
 };
 
 #endif

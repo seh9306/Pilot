@@ -1,11 +1,11 @@
 #include "PublishManager.h"
-#include "FileManager.h"
-
-#include "PacketProcessor/PacketProcessor.h"
 
 #include <iostream>
-
 #include <WinSock2.h>
+
+#include "FileManager.h"
+#include "PacketProcessor/PacketProcessor.h"
+#include "Server/NetworkData.h"
 
 PublishManager::PublishManager()
 {
@@ -21,51 +21,65 @@ PublishManager& PublishManager::GetInstance()
 	return publishManager;
 }
 
-LPPER_IO_DATA PublishManager::CreateData(char* msg, int size)
+AsyncIOBuffer* PublishManager::CreateData(char* msg, int size)
 {
-	LPPER_IO_DATA perIoData = new PER_IO_DATA;
+	// memory will be deleted after send in Recevier.cpp
+	AsyncIOBuffer* asyncIOBuffer = new AsyncIOBuffer();
 
-	memset(&(perIoData->overlapped), 0, sizeof(OVERLAPPED));
-	perIoData->wsaBuf.len = size;
+	if (asyncIOBuffer == nullptr)
+	{
+		return nullptr;
+	}
+
+	memset(&(asyncIOBuffer->overlapped), 0, sizeof(OVERLAPPED));
+	asyncIOBuffer->wsaBuf.len = size;
 
 	// copy data
-	if (msg != nullptr) {
-		memcpy(perIoData->buffer, msg, size);
+	if (msg != nullptr) 
+	{
+		memcpy(asyncIOBuffer->buffer, msg, size);
+	}
+	else
+	{
+		delete asyncIOBuffer;
+		return nullptr;
 	}
 	
-	perIoData->wsaBuf.buf = perIoData->buffer;
+	asyncIOBuffer->wsaBuf.buf = asyncIOBuffer->buffer;
+	asyncIOBuffer->type = IOCP_ASYNC_SEND;
 
-	perIoData->type = IOCP_ASYNC_SEND;
-
-	return perIoData;
+	return asyncIOBuffer;
 }
 
 bool PublishManager::Publish(char * msg, std::list<SOCKET>& socks, int size)
 {
 	for (SOCKET sock : socks)
 	{
-		LPPER_IO_DATA perIoData = CreateData(msg, size);
-
-		if (WSASend(sock, &(perIoData->wsaBuf), 1,
-			nullptr, 0, &(perIoData->overlapped), nullptr) == SOCKET_ERROR)
-		{
-			if (WSAGetLastError() != WSA_IO_PENDING)
-				std::cout << "WSASend() error :: " << GetLastError() << std::endl;
-		}
+		Publish(msg, sock, size);
 	}
 	return true;
 }
 
 void PublishManager::Publish(char * msg, SOCKET sock, int size)
 {
-	LPPER_IO_DATA perIoData = CreateData(msg, size);
+	AsyncIOBuffer* perIoData = CreateData(msg, size);
 	
-	perIoData->type = IOCP_ASYNC_SEND;
+	if (perIoData == nullptr)
+	{
+		std::cout << "Memory allocate error" << std::endl;
+		return;
+	}
 
 	if (WSASend(sock, &(perIoData->wsaBuf), 1,
 		nullptr, 0, &(perIoData->overlapped), nullptr) == SOCKET_ERROR)
 	{
-		if (WSAGetLastError() != WSA_IO_PENDING)
+		if (WSAGetLastError() != WSA_IO_PENDING) {
 			std::cout << "WSASend() error :: " << GetLastError() << std::endl;
+		}
+		else
+		{
+		//	delete perIoData;
+		}
+			
 	}
 }

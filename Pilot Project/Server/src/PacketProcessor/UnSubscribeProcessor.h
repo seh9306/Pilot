@@ -9,7 +9,7 @@ class UnSubscribeProcessor :
 public:
 	UnSubscribeProcessor();
 	virtual ~UnSubscribeProcessor();
-	virtual void PacketProcess(SOCKET sock, char *msg);
+	virtual void ProcessPacket(SOCKET sock, char *msg);
 };
 
 #endif

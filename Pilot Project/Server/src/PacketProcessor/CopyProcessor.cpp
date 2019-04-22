@@ -11,7 +11,7 @@ CopyProcessor::~CopyProcessor()
 {
 }
 
-void CopyProcessor::PacketProcess(SOCKET sock, char * msg)
+void CopyProcessor::ProcessPacket(SOCKET sock, char * msg)
 {
 
 }

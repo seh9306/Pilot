@@ -1,7 +1,5 @@
-#include "SubscribeProcessor.h"
-
-#include <iostream>
 #include "ConnectProcessor.h"
+#include "SubscribeProcessor.h"
 
 ConnectProcessor::ConnectProcessor()
 {
@@ -11,30 +9,26 @@ ConnectProcessor::~ConnectProcessor()
 {
 }
 
-void ConnectProcessor::PacketProcess(SOCKET sock, char * msg)
+void ConnectProcessor::ProcessPacket(SOCKET sock, char * msg)
 {
-	msg[0] = kConnect;
+	int offset = PROTOCOL_TYPE_SIZE;
+	void* address = nullptr;
 
-	int len = PROTOCOL_TYPE_SIZE;
+	msg[kProtocolHeaderIndex] = kConnect;
 
-	int numberOfDrives = (int)fileManager->GetNumberOfDrives();
-	memcpy(msg + len, &(numberOfDrives), sizeof(int));
-	len += sizeof(int);
+	uint32_t numberOfDrives = (uint32_t)fileManager->GetNumberOfDrives();
+	WriteLengthWithAddingSize(msg, &numberOfDrives, sizeof(uint32_t), offset);
 
 	wchar_t* pLogicalDriveStrings = fileManager->GetLogicalDriveStringsW();
 
 	for (int i = 0; i < numberOfDrives; i++)
 	{
-		void* address = pLogicalDriveStrings + 4 * i;
-		memcpy(msg + len, address, sizeof(wchar_t) * 4);
-		len += sizeof(wchar_t) * 4;
+		address = pLogicalDriveStrings + driverStringLength * i;
+		WriteMessageWithAddingSize(msg, address, sizeof(wchar_t) * driverStringLength, offset);
 
-		unsigned int type = GetDriveTypeW((LPCWSTR)address);
-
-		memcpy(msg + len, &type, sizeof(unsigned int));
-		len += sizeof(unsigned int);
+		uint32_t type = GetDriveTypeW((LPCWSTR)address);
+		WriteMessageWithAddingSize(msg, &type, sizeof(uint32_t), offset);
 	}
 	
-	publishManager->Publish(msg, sock, len);
-
+	publishManager->Publish(msg, sock, offset);
 }

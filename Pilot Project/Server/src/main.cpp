@@ -1,10 +1,11 @@
 #if defined(_DEBUG)
 #define _CRTDBG_MAP_ALLOC
 #define new new(_NORMAL_BLOCK, __FILE__, __LINE__)
-#endif
 
 #include <crtdbg.h>
 #include <cstdlib>
+
+#endif
 
 
 #include "server/Server.h"
@@ -19,15 +20,14 @@ int main(int argc, char *args)
 
 	// create Server
 	Server server;
-	int code = 0;
+	int8_t errorCode = server.Init(9030);
 
 	// initialize server
-	if ((code = server.Init()) == -1) 
+	// 0 means success
+	if (errorCode != 0)
 	{
-
-		switch (code) 
+		switch (errorCode)
 		{
-
 		case kBindError:
 			error_handle("bind() error !");
 			exit(1);
@@ -36,12 +36,13 @@ int main(int argc, char *args)
 			error_handle("listen() error !");
 			exit(1);
 			break;
-
 		}
 	}
 
 	// start server
-	if ((code = server.Start()) != 0)
+	// 0 means success
+	errorCode = server.Start();
+	if (errorCode != 0)
 	{
 		error_handle("Start() error !");
 		exit(1);
