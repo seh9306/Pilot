@@ -5,17 +5,23 @@
 #include "FileAgentSocket.h"
 #include <iostream>
 
-void Receiver::operator()(HANDLE pComPort, std::vector<PacketProcessor *> &packetProcessors)
+void Receiver::operator()(HANDLE pComPort, std::vector<std::unique_ptr<PacketProcessor>>* packetProcessors)
 {
-	hCompletionPort = pComPort;
+	SocketDataPerClient* socketDataPerClient;
+	AsyncIOBuffer* asyncIOBuffer = nullptr;
+
+	DWORD bytesTransferred = 0;
+	DWORD flags = 0; // (?)
 	while (true) 
 	{
-		GetQueuedCompletionStatus(hCompletionPort,
+		int errorCode = GetQueuedCompletionStatus(pComPort,
 			&bytesTransferred,
-			(PULONG_PTR)&perHandleData,
-			(LPOVERLAPPED*)&perIoData,
+			(PULONG_PTR)&socketDataPerClient,
+			(LPOVERLAPPED*)&asyncIOBuffer,
 			INFINITE
 		);
+
+		printf("::%d, %d\n", WSAGetLastError(), errorCode);
 		if (bytesTransferred == 0)
 		{
 			// @issue make socket INVALID_SOCKET
@@ -25,37 +31,40 @@ void Receiver::operator()(HANDLE pComPort, std::vector<PacketProcessor *> &packe
 				fileAgentSocket->CloseSocket();
 			}
 			//closesocket(perHandleData->hClntSock);
-			delete perHandleData;
-			delete perIoData;
+			//delete socketDataPerClient;
+			delete asyncIOBuffer;
 			continue;
 		}
 		// decompress packet
 		// ...
 
 		// distribute packet
-		if (packetProcessors.size() > (unsigned char)perIoData->wsaBuf.buf[0]) {
-			PacketProcessor *packetProcessor = packetProcessors.at(perIoData->wsaBuf.buf[0]);
+		if (packetProcessors->size() > (unsigned char)asyncIOBuffer->wsaBuf.buf[0]) {
+			PacketProcessor *packetProcessor = packetProcessors->at(asyncIOBuffer->wsaBuf.buf[0]).get();
 			// packet processing 
 			// according to each protocol number ( vector index )
-			packetProcessor->PacketProcess(perHandleData->hClntSock,
-				perIoData->wsaBuf.buf); 
+			if (packetProcessor != nullptr)
+			{
+				packetProcessor->PacketProcess(socketDataPerClient->clientSocket,
+					asyncIOBuffer->wsaBuf.buf);
+			}
 		}
 		else {
 			std::cout << "no packet processor" << std::endl;
 		}
 
-		memset(&(perIoData->overlapped), 0, sizeof(OVERLAPPED));
-		perIoData->wsaBuf.len = BUFSIZE;
-		perIoData->wsaBuf.buf = perIoData->buffer;
+		memset(&(asyncIOBuffer->overlapped), 0, sizeof(OVERLAPPED));
+		asyncIOBuffer->wsaBuf.len = BUFSIZE;
+		asyncIOBuffer->wsaBuf.buf = asyncIOBuffer->buffer;
 
 		flags = 0;
 
-		WSARecv(perHandleData->hClntSock,
-			&(perIoData->wsaBuf),
+		WSARecv(socketDataPerClient->clientSocket,
+			&(asyncIOBuffer->wsaBuf),
 			1,
 			nullptr,
 			&flags,
-			&(perIoData->overlapped),
+			&(asyncIOBuffer->overlapped),
 			nullptr
 		);
 

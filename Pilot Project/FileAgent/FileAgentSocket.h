@@ -3,6 +3,8 @@
 
 #include <WinSock2.h>
 #include <vector>
+#include <memory>
+
 #include "NetworkData.h"
 #include "PacketProcessor.h"
 
@@ -25,13 +27,15 @@ public:
 	void Delete(char* dir, char* fileName, char attribute);
 	void Rename(char* dir, char* oldName, char* newName);
 	void Move(char* dir, char* fileName, char* goal, WIN32_FIND_DATA & file);
+
 private:
 	FileAgentSocket();
+	void AddProcessor(PacketProcessor* packetProcessor);
 	static FileAgentSocket* fileAgent;
 	HANDLE hCompletionPort; // Handle of Completion Port
 	SOCKET fileAgentSocket;
 	WSADATA wsaData;
-	sockaddr_in srv_addr;
+	SOCKADDR_IN serverAddress;
 	WSABUF dataBuf;
 	int sendBytes = 0;
 	char buffer[1024];
@@ -39,12 +43,12 @@ private:
 
 	CString stringTableValue;
 
-	PER_HANDLE_DATA *perHandleData;
-	PER_IO_DATA *perIoData;
+	SocketDataPerClient* socketDataPerClient;
+	AsyncIOBuffer* asyncIOBuffer;
 	DWORD flags;
 	DWORD recvBytes;
 
-	std::vector<PacketProcessor *> packetProcessors;
+	std::vector<std::unique_ptr<PacketProcessor>> packetProcessors;
 };
 
 #endif

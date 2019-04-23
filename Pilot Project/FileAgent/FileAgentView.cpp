@@ -371,8 +371,8 @@ void CFileAgentView::OnItemDblclked(NMHDR * pNMHDR, LRESULT * pResult)
 
 	CString sIndexValue;
 	CString attr;
-	sIndexValue = fileCListCtrl.GetItemText(itemid, 0);
-	attr = fileCListCtrl.GetItemText(itemid, 3);
+	sIndexValue = fileCListCtrl.GetItemText(itemid, nameColumnPos);
+	attr = fileCListCtrl.GetItemText(itemid, attributeDateColumnPos);
 	
 	if (((DWORD)_ttoi((LPCTSTR)attr) & FILE_ATTRIBUTE_DIRECTORY) && (sIndexValue != CString(".")))
 	{
@@ -412,9 +412,9 @@ void CFileAgentView::DeleteFileRequest()
 	POSITION pos = fileCListCtrl.GetFirstSelectedItemPosition();
 	int nItem = fileCListCtrl.GetNextSelectedItem(pos);
 
-	strcpy_s(pFileName, CT2A(fileCListCtrl.GetItemText(nItem, 0)));
+	strcpy_s(pFileName, CT2A(fileCListCtrl.GetItemText(nItem, nameColumnPos)));
 
-	char attribute = _ttoi(fileCListCtrl.GetItemText(nItem, 3)) & FILE_ATTRIBUTE_DIRECTORY;
+	char attribute = _ttoi(fileCListCtrl.GetItemText(nItem, attributeDateColumnPos)) & FILE_ATTRIBUTE_DIRECTORY;
 
 	FileAgentSocket *fileAgentSocket = FileAgentSocket::GetInstance();
 	fileAgentSocket->Delete(pCharDir, pFileName, attribute);
@@ -475,8 +475,6 @@ void CFileAgentView::OnBeginDrag(NMHDR * pNMHDR, LRESULT * pResult)
 void CFileAgentView::OnTvnSelChangedTree(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LPNMTREEVIEW pNMTreeView = reinterpret_cast<LPNMTREEVIEW>(pNMHDR);
-
-
 }
 
 int CFileAgentView::GetHitIndex(CPoint point)
@@ -607,7 +605,7 @@ void CFileAgentView::OnEndLabelEdit(NMHDR * pNMHDR, LRESULT * pResult)
 	CEdit* pEdit = fileCListCtrl.GetEditControl();
 	pEdit->GetWindowTextW(str);
 
-	strcpy_s(pFileOldName, CT2A(fileCListCtrl.GetItemText(pDispInfo->item.iItem, 0)));
+	strcpy_s(pFileOldName, CT2A(fileCListCtrl.GetItemText(pDispInfo->item.iItem, nameColumnPos)));
 	strcpy_s(pFileNewName, CT2A(str));
 
 	FileAgentSocket *fileAgentSocket = FileAgentSocket::GetInstance();
@@ -690,7 +688,7 @@ void CFileAgentView::OnLvnGetdispinfoList(NMHDR * pNMHDR, LRESULT * pResult)
 		}
 		else if (pItem->iSubItem == attributeDateColumnPos)
 		{
-			if (files[itemid].dwFileAttributes & 16)
+			if (files[itemid].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 			{ // 폴더
 				text.Format(TEXT("%d"), files[itemid].dwFileAttributes);
 			}
@@ -721,11 +719,11 @@ void CFileAgentView::OnLvnGetdispinfoList(NMHDR * pNMHDR, LRESULT * pResult)
 	{
 		if (files[itemid].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 		{
-			pItem->iImage = 0;
+			pItem->iImage = DIRECTORY_FILE_IMAGE_INDEX;
 		}
 		else
 		{
-			pItem->iImage = 1;
+			pItem->iImage = NORMAL_FILE_IMAGE_INDEX;
 		}
 		
 	}

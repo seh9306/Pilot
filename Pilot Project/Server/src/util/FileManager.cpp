@@ -28,7 +28,7 @@ bool FileManager::DeleteFileByFileName(char* dir, char* fileName, char fileType)
 	strcat(temp, dir);
 	strcat(temp, fileName);
 
-	if (fileType == 1) // FILE_TYPE_DIRECTORY
+	if (fileType == 1) // kFileTypeDirectory
 	{
 		// @issue recursion delete
 		bool result = RemoveDirectory(temp);
@@ -36,7 +36,7 @@ bool FileManager::DeleteFileByFileName(char* dir, char* fileName, char fileType)
 		delete[]temp;
 		return result;
 	}
-	else if (fileType == 0) // FILE_TYPE_NORMAL
+	else if (fileType == 0) // kFileTypeNormal
 	{
 		HANDLE hFile;
 

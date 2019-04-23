@@ -3,18 +3,33 @@
 
 #define BUFSIZE 1024
 
+#define IOCP_ASYNC_RECV 1
+#define IOCP_ASYNC_SEND 2
+
 #include <WinSock2.h>
 
-typedef struct {
-	SOCKET hClntSock; // Handle Client Socket
-	SOCKADDR_IN clntAddr; // Client Address
-} PER_HANDLE_DATA, *LPPER_HANDLE_DATA;
+struct SocketDataPerClient
+{
+	SocketDataPerClient() {}
+	SocketDataPerClient(SOCKET clientSocket, SOCKADDR_IN clientAddress)
+		: clientSocket(clientSocket), clientAddress(clientAddress) {}
+	SOCKET clientSocket;
+	SOCKADDR_IN clientAddress;
+};
 
-typedef struct {
-	OVERLAPPED overlapped; // handle Event 이벤트 처리 할 수 있는 구조체?
-	char buffer[BUFSIZE + 1];
-	WSABUF wsaBuf; // buffer length, buffer
+struct AsyncIOBuffer
+{
+	AsyncIOBuffer() {}
+	AsyncIOBuffer(int type) : type(type)
+	{
+		memset(&(overlapped), 0, sizeof(OVERLAPPED));
+		wsaBuf.buf = buffer;
+		wsaBuf.len = BUFSIZE;
+	}
+	OVERLAPPED overlapped;
+	char buffer[BUFSIZE];
+	WSABUF wsaBuf;
 	int type;
-} PER_IO_DATA, *LPPER_IO_DATA;
+};
 
 #endif

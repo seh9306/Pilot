@@ -16,12 +16,12 @@ void ShowProcessor::ProcessPacket(SOCKET sock, char *msg)
 {
 	uint32_t dirLength = 0;
 
-	int readOffset = 0 + PROTOCOL_TYPE_SIZE + sizeof(DWORD);
+	int readOffset = 0 + kProtocolTypeSize + sizeof(DWORD);
 
 	ReadLengthWithAddingSize(&dirLength, msg, sizeof(dirLength), readOffset);
 
 	// @issue
-	if (!msg || dirLength > SHOW_HEADER_SIZE + MAX_PATH + NULL_VALUE_SIZE) // MAX_PATH 260..
+	if (!msg || dirLength > kShowHeaderSize + MAX_PATH + kNullValueSize) // MAX_PATH 260..
 	{
 		return;
 	}
@@ -36,11 +36,11 @@ void ShowProcessor::ProcessPacket(SOCKET sock, char *msg)
 	
 	uint32_t showNumber = -1;
 
-	readOffset = PROTOCOL_TYPE_SIZE;
+	readOffset = kProtocolTypeSize;
 	ReadMessage(&showNumber, msg, sizeof(showNumber), readOffset);
 
 	uint32_t listSize = files->size();
-	int writeOffset = PROTOCOL_TYPE_SIZE;
+	int writeOffset = kProtocolTypeSize;
 
 	WriteLengthWithAddingSize(msg, &listSize, sizeof(listSize), writeOffset);
 
@@ -48,7 +48,7 @@ void ShowProcessor::ProcessPacket(SOCKET sock, char *msg)
 	publishManager->Publish(msg, sock, writeOffset);
 
 	msg[0] = kShowAdd;
-	writeOffset = PROTOCOL_TYPE_SIZE;
+	writeOffset = kProtocolTypeSize;
 
 	WriteLengthWithAddingSize(msg, &showNumber, sizeof(showNumber), writeOffset);
 
@@ -56,27 +56,27 @@ void ShowProcessor::ProcessPacket(SOCKET sock, char *msg)
 	{
 		uint32_t fileNameSize = strlen(file.cFileName);
 
-		uint32_t size = WIN_FIND_DATA_FRONT_SIZE
+		uint32_t size = kWinFindDataFrontSize
 			+ fileNameSize
 			+ sizeof(fileNameSize)
-			+ NULL_VALUE_SIZE;
+			+ kNullValueSize;
 		if (size + writeOffset > BUFSIZE - 2)
 		{
 			msg[writeOffset] = '\n';
 			writeOffset++;
 
 			publishManager->Publish(msg, sock, 1024);
-			writeOffset = 0 + PROTOCOL_TYPE_SIZE + sizeof(showNumber);
+			writeOffset = 0 + kProtocolTypeSize + sizeof(showNumber);
 		}
 
 		// copy file data front
-		WriteMessageWithAddingSize(msg, &file, WIN_FIND_DATA_FRONT_SIZE, writeOffset);
+		WriteMessageWithAddingSize(msg, &file, kWinFindDataFrontSize, writeOffset);
 
 		// copy file name size
 		WriteMessageWithAddingSize(msg, &fileNameSize, sizeof(fileNameSize), writeOffset);
 
 		// copy file name
-		WriteMessageWithAddingSize(msg, &file.cFileName, fileNameSize + NULL_VALUE_SIZE, writeOffset);
+		WriteMessageWithAddingSize(msg, &file.cFileName, fileNameSize + kNullValueSize, writeOffset);
 	}
 
 	if (writeOffset != 0)

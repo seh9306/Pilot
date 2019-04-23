@@ -25,34 +25,29 @@ FileAgentSocket::FileAgentSocket()
 
 	// Create IO CompletionPort
 	hCompletionPort = CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, 1);
-
-	packetProcessors.push_back(new SubscribeProcessor());
-	packetProcessors.push_back(nullptr); // UnSubscribe
-	packetProcessors.push_back(new ShowProcessor());
-	packetProcessors.push_back(new ShowAddProcessor());
-	packetProcessors.push_back(new CopyProcessor());
-	packetProcessors.push_back(new RenameProcessor());
-	packetProcessors.push_back(new DeleteProcessor());
-	packetProcessors.push_back(new MoveProcessor());
-	packetProcessors.push_back(new ConnectProcessor());
+	
+	AddProcessor(new SubscribeProcessor());
+	AddProcessor(nullptr); // UnSubscribe
+	AddProcessor(new ShowProcessor());
+	AddProcessor(new ShowAddProcessor());
+	AddProcessor(new CopyProcessor());
+	AddProcessor(new RenameProcessor());
+	AddProcessor(new DeleteProcessor());
+	AddProcessor(new MoveProcessor());
+	AddProcessor(new ConnectProcessor());
 
 }
 
+void FileAgentSocket::AddProcessor(PacketProcessor* packetProcessor)
+{
+	packetProcessors.push_back(
+		std::unique_ptr<PacketProcessor>(packetProcessor)
+	);
+}
 // @issue
 FileAgentSocket::~FileAgentSocket() 
 {
 	TRACE(TEXT("FileAgentSocket ¼Ò¸ê"));
-	int size = packetProcessors.size();
-	for (int index = 0; index < size; index++)
-	{
-		PacketProcessor* packetProcessor = packetProcessors.at(index);
-		if (packetProcessor)
-		{
-			delete packetProcessor;
-		}
-	}
-	packetProcessors.clear();
-
 }
 
 // @issue
@@ -71,9 +66,8 @@ void FileAgentSocket::releaseInstance()
 {
 	if (fileAgent) 
 	{
-		// issue#
-		//closesocket(fileAgentSocket);
-		//fileAgentSocket = INVALID_SOCKET;
+		closesocket(fileAgent->fileAgentSocket);
+		fileAgent->fileAgentSocket = INVALID_SOCKET;
 		delete fileAgent;
 		fileAgent = nullptr;
 	}
@@ -103,13 +97,13 @@ void FileAgentSocket::Connect(char *ipAddress, int port)
 		fileAgentSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
 	}
 	
-	srv_addr.sin_family = AF_INET;
-	srv_addr.sin_addr.s_addr = inet_addr(ipAddress);
-	srv_addr.sin_port = htons(port);
+	serverAddress.sin_family = AF_INET;
+	serverAddress.sin_addr.s_addr = inet_addr(ipAddress);
+	serverAddress.sin_port = htons(port);
 
 	Receiver receiver;
 	receiver.id = 0;
-	std::thread IOCPThread(receiver, hCompletionPort, packetProcessors);
+	std::thread IOCPThread(receiver, hCompletionPort, &packetProcessors);
 	IOCPThread.detach();
 	// ¸Þ½ÃÁö ÆßÇÎ
 	/*bool connecting = true;
@@ -132,7 +126,7 @@ void FileAgentSocket::Connect(char *ipAddress, int port)
 
 	// @issue TEXT String Table
 	//WSAConnect(fileAgentSocket, (sockaddr *)&srv_addr, sizeof(srv_addr), nullptr, nullptr, nullptr, nullptr);
-	if (connect(fileAgentSocket, (sockaddr *)&srv_addr, sizeof(srv_addr)) == -1) {
+	if (connect(fileAgentSocket, (sockaddr *)&serverAddress, sizeof(serverAddress)) == -1) {
 		stringTableValue.LoadStringW(FILE_CLIENT_CONNECT_FAIL);
 		AfxMessageBox(stringTableValue);
 		fileAgentSocket = INVALID_SOCKET;
@@ -144,24 +138,21 @@ void FileAgentSocket::Connect(char *ipAddress, int port)
 
 	SendConnectionMessage();
 
-	perHandleData = new PER_HANDLE_DATA;
-	perHandleData->hClntSock = fileAgentSocket;
-	memcpy(&(perHandleData->clntAddr), &fileAgentSocket, sizeof(fileAgentSocket));
+	SocketDataPerClient* socketDataPerClient
+		= new SocketDataPerClient(fileAgentSocket, serverAddress);
 
-	CreateIoCompletionPort((HANDLE)fileAgentSocket, hCompletionPort, (DWORD)perHandleData, 0);
+	CreateIoCompletionPort((HANDLE)fileAgentSocket, hCompletionPort, (DWORD)socketDataPerClient, 0);
 
-	perIoData = new PER_IO_DATA;
-	memset(&(perIoData->overlapped), 0, sizeof(OVERLAPPED));
-	perIoData->wsaBuf.len = BUFSIZE;
-	perIoData->wsaBuf.buf = perIoData->buffer;
+	AsyncIOBuffer* asyncIOBuffer = new AsyncIOBuffer(IOCP_ASYNC_RECV);
+
 	flags = 0; // (?)
 
-	WSARecv(perHandleData->hClntSock,
-		&(perIoData->wsaBuf),
+	WSARecv(socketDataPerClient->clientSocket,
+		&(asyncIOBuffer->wsaBuf),
 		1,
-		&recvBytes,
+		nullptr,
 		&flags,
-		&(perIoData->overlapped),
+		&(asyncIOBuffer->overlapped),
 		nullptr
 	);
 }

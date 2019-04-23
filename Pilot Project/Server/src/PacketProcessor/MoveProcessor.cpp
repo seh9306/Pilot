@@ -16,20 +16,20 @@ void MoveProcessor::ProcessPacket(SOCKET sock, char * msg)
 	uint32_t fileNameLength	= 0;
 	uint32_t goalLength		= 0;
 	
-	int offset = 0 + PROTOCOL_TYPE_SIZE;
+	int offset = 0 + kProtocolTypeSize;
 
 	ReadLengthWithAddingLengthAndSize(&dirLength, msg, sizeof(dirLength), offset);
 	ReadLengthWithAddingLengthAndSize(&fileNameLength, msg, sizeof(fileNameLength), offset);
 	ReadLength(&goalLength, msg, sizeof(goalLength), offset);
 
 	if (!msg || dirLength + fileNameLength + goalLength>
-		MOVE_HEADER_SIZE + MAX_PATH + NULL_VALUE_SIZE * 3) // MAX_PATH 260..
+		kMoveHeaderSize + MAX_PATH + kNullValueSize * 3) // MAX_PATH 260..
 	{
 		return;
 	}
 
 	// File move
-	offset = 0 + PROTOCOL_TYPE_SIZE + sizeof(int);
+	offset = 0 + kProtocolTypeSize + sizeof(int);
 
 	char* pDir = msg + offset;
 	offset += dirLength + sizeof(int);
@@ -53,7 +53,7 @@ void MoveProcessor::ProcessPacket(SOCKET sock, char * msg)
 
 	if (sockets != nullptr)
 	{
-		publishManager->Publish(msg, *sockets, RENAME_HEADER_SIZE + dirLength + fileNameLength);
+		publishManager->Publish(msg, *sockets, kRenameHeaderSize + dirLength + fileNameLength);
 	}
 
 	sockets = subscribeManager->GetSocketsByDir(pNewFileDir);

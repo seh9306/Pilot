@@ -10,5 +10,5 @@ UnSubscribeProcessor::~UnSubscribeProcessor()
 
 void UnSubscribeProcessor::ProcessPacket(SOCKET sock, char *msg)
 {
-	subscribeManager->UnSubscribe(msg + SUB_HEADER_SIZE, sock);
+	subscribeManager->UnSubscribe(msg + kSubHeaderSize, sock);
 }

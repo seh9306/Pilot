@@ -58,10 +58,10 @@ int main()
 	WSADATA wsaData;
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
 		ErrorHandling("WSAStartup() error!");
-	std::thread t[1000];
+	std::thread t[1500];
 
 	// 스레드 시작
-	for (int i = 0; i < 100; ++i) {
+	for (int i = 0; i < 1500; ++i) {
 		t[i] = std::thread(call_from_thread, i);
 		//Sleep(1);
 	}
@@ -69,7 +69,7 @@ int main()
 	std::cout << "메인 함수 시작" << std::endl;
 
 	//스레드가 종료될 때 까지 대기
-	for (int i = 0; i < 100; ++i) {
+	for (int i = 0; i < 700; ++i) {
 		t[i].join();
 	}
 

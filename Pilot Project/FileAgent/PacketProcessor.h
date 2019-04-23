@@ -5,8 +5,6 @@
 
 #include "FileAgentView.h"
 
-#define NUM_OF_PACKET_PROCESSOR		5
-
 // protocol header
 #define SUB_HEADER_SIZE				5
 #define DELETE_HEADER_SIZE			10

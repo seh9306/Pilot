@@ -18,33 +18,13 @@
 #define EXPLOREBTN_ID 26009
 #define FILECTREECTRL_ID 26010
 
+#define DIRECTORY_FILE_IMAGE_INDEX 0
+#define NORMAL_FILE_IMAGE_INDEX 1
+
 class CFileAgentDoc;
 
 class CFileAgentView : public CView
 {
-protected: // serialization에서만 만들어집니다.
-	CFileAgentView() noexcept;
-	DECLARE_DYNCREATE(CFileAgentView)
-
-// 특성입니다.
-public:
-	CListCtrl fileCListCtrl;
-	CTreeCtrl fileCTreeCtrl;
-	CImageList imgList;
-	CImageList *pDragImage;
-
-	CEdit iPAddressCEdit;
-	CEdit portCEdit;
-	CEdit dirCEdit;
-
-	CStatic iPAddresscStatic;
-	CStatic portStatic;
-	CStatic dirStatic;
-
-	CButton connectBtn;
-	CButton exploreBtn;
-
-// 작업입니다.
 public:
 	CFileAgentDoc* GetDocument() const;
 	void AddItem(WIN32_FIND_DATA& file);
@@ -60,29 +40,13 @@ public:
 	char* GetPCharDir();
 	void SetItemCountEx(int count = -1);
 	void AddDrives(wchar_t * pLogicalDriveStrings, int type);
-// 재정의입니다.
-public:
 	virtual void OnDraw(CDC* pDC);  // 이 뷰를 그리기 위해 재정의되었습니다.
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
-protected:
-	virtual BOOL OnPreparePrinting(CPrintInfo* pInfo);
-	virtual void OnBeginPrinting(CDC* pDC, CPrintInfo* pInfo);
-	virtual void OnEndPrinting(CDC* pDC, CPrintInfo* pInfo);
-
-// 구현입니다.
-public:
 	virtual ~CFileAgentView();
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;
 #endif
-
-protected:
-
-// 생성된 메시지 맵 함수
-protected:
-	DECLARE_MESSAGE_MAP()
-public:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnConeectBtnClicked();
 	afx_msg void OnExploreBtnClicked();
@@ -100,7 +64,31 @@ public:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnLvnGetdispinfoList(NMHDR *pNMHDR, LRESULT *pResult);
 
+protected: 
+	CFileAgentView() noexcept;
+	DECLARE_DYNCREATE(CFileAgentView)
+	virtual BOOL OnPreparePrinting(CPrintInfo* pInfo);
+	virtual void OnBeginPrinting(CDC* pDC, CPrintInfo* pInfo);
+	virtual void OnEndPrinting(CDC* pDC, CPrintInfo* pInfo);
+	DECLARE_MESSAGE_MAP()
+
 private:
+	CListCtrl fileCListCtrl;
+	CTreeCtrl fileCTreeCtrl;
+	CImageList imgList;
+	CImageList *pDragImage;
+
+	CEdit iPAddressCEdit;
+	CEdit portCEdit;
+	CEdit dirCEdit;
+
+	CStatic iPAddresscStatic;
+	CStatic portStatic;
+	CStatic dirStatic;
+
+	CButton connectBtn;
+	CButton exploreBtn;
+
 	bool bDrag = false;        
 	int         nOldTarget = -1;   
 	int         nSource = -1;      

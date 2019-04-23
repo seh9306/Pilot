@@ -17,20 +17,20 @@ void RenameProcessor::ProcessPacket(SOCKET sock, char * msg)
 	uint32_t oldFileLength	= 0;
 	uint32_t newFileLength	= 0;
 
-	int offset = 0 + PROTOCOL_TYPE_SIZE;
+	int offset = 0 + kProtocolTypeSize;
 
 	ReadLengthWithAddingLengthAndSize(&dirLength, msg, sizeof(dirLength), offset);
 	ReadLengthWithAddingLengthAndSize(&oldFileLength, msg, sizeof(dirLength), offset);
 	ReadLength(&newFileLength, msg, sizeof(dirLength), offset);
 
 	if (!msg || dirLength + oldFileLength + newFileLength > 
-		RENAME_HEADER_SIZE + MAX_PATH * 3 + NULL_VALUE_SIZE * 3) // MAX_PATH 260..
+		kRenameHeaderSize + MAX_PATH * 3 + kNullValueSize * 3) // MAX_PATH 260..
 	{
 		return;
 	}
 
 	// File rename
-	offset = 0 + PROTOCOL_TYPE_SIZE + sizeof(int);
+	offset = 0 + kProtocolTypeSize + sizeof(int);
 
 	char* pDir = msg + offset;
 	offset += dirLength + sizeof(int);
@@ -51,6 +51,6 @@ void RenameProcessor::ProcessPacket(SOCKET sock, char * msg)
 
 	if (sockets != nullptr)
 	{
-		publishManager->Publish(msg, *sockets, RENAME_HEADER_SIZE + dirLength + oldFileLength + newFileLength);
+		publishManager->Publish(msg, *sockets, kRenameHeaderSize + dirLength + oldFileLength + newFileLength);
 	}
 }

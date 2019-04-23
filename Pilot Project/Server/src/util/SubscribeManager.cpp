@@ -16,11 +16,14 @@ SubscribeManager& SubscribeManager::GetInstance()
 	static SubscribeManager subscribeManager;
 	return subscribeManager;
 }
+#include <mutex>
+std::mutex lock;
 
 bool SubscribeManager::Subscribe(char *dir, SOCKET sock) 
 {
 	std::string dirString(dir);
-	std::cout << "Subscribe " << dirString << std::endl;
+	//std::cout << "Subscribe " << dirString << std::endl;
+	lock.lock();
 	auto search = sockets.find(dirString);
 
 	if (search != sockets.end()) 
@@ -40,20 +43,23 @@ bool SubscribeManager::Subscribe(char *dir, SOCKET sock)
 	}
 
 	dirs.insert({ sock, dirString });
-
+	lock.unlock();
 	return true;
 }
+
 
 bool SubscribeManager::UnSubscribe(SOCKET clientSocket)
 {
 	std::string dirString = GetDirBySocket(clientSocket);
-
+	
+	lock.lock();
 	auto search = sockets.find(dirString);
-
+	
 	if (search != sockets.end())
 	{
 		if (search->second == nullptr)
 		{
+			lock.unlock();
 			return false;
 		}
 		
@@ -71,9 +77,10 @@ bool SubscribeManager::UnSubscribe(SOCKET clientSocket)
 	}
 	else
 	{
+		lock.unlock();
 		return false;
 	}
-
+	lock.unlock();
 	return true;
 }
 

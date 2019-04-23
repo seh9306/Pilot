@@ -1,6 +1,6 @@
 #include "ConnectProcessor.h"
 #include "SubscribeProcessor.h"
-
+#include <iostream>
 ConnectProcessor::ConnectProcessor()
 {
 }
@@ -11,7 +11,8 @@ ConnectProcessor::~ConnectProcessor()
 
 void ConnectProcessor::ProcessPacket(SOCKET sock, char * msg)
 {
-	int offset = PROTOCOL_TYPE_SIZE;
+	std::cout << "µé¾î¿È" << std::endl;
+	int offset = kProtocolTypeSize;
 	void* address = nullptr;
 
 	msg[kProtocolHeaderIndex] = kConnect;

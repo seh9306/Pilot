@@ -13,8 +13,8 @@ void Receiver::operator()(Server* server,
 {
 	SubscribeManager& subcribeManager = SubscribeManager::GetInstance();
 	
-	AsyncIOBuffer* asyncIOBuffer;
-	SocketDataPerClient* socketDataPerClient = 0;
+	AsyncIOBuffer* asyncIOBuffer = nullptr;
+	SocketDataPerClient* socketDataPerClient = nullptr;
 	
 	DWORD bytesTransferred = 0;
 	DWORD flags = 0;
@@ -27,7 +27,7 @@ void Receiver::operator()(Server* server,
 			(LPOVERLAPPED*)&asyncIOBuffer,
 			INFINITE
 		);
-
+		
 		if (bytesTransferred == 0)
 		{
 			subcribeManager.UnSubscribe(socketDataPerClient->clientSocket);
@@ -74,6 +74,13 @@ void Receiver::operator()(Server* server,
 				&(asyncIOBuffer->overlapped),
 				nullptr
 			);
+			/*
+			{
+				int errorCode = WSAGetLastError();
+
+				if(errorCode != WSA_IO_PENDING && errorCode !=0)
+					subcribeManager.UnSubscribe(socketDataPerClient->clientSocket);
+			}*/
 
 		}
 		else if (asyncIOBuffer->type == IOCP_ASYNC_SEND)

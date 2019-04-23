@@ -13,17 +13,17 @@ void SubscribeProcessor::ProcessPacket(SOCKET sock, char *msg)
 {
 	int length = 0;
 
-	memcpy(&length, msg + PROTOCOL_TYPE_SIZE, sizeof(int));
+	memcpy(&length, msg + kProtocolTypeSize, sizeof(int));
 
-	if (!msg || length > SUB_HEADER_SIZE + MAX_PATH + NULL_VALUE_SIZE ) // MAX_PATH 260..
+	if (!msg || length > kSubHeaderSize + MAX_PATH + kNullValueSize ) // MAX_PATH 260..
 	{
 		return;
 	}
 
 	// subscribe directory
-	if (subscribeManager->Subscribe(msg + SUB_HEADER_SIZE, sock))
+	if (subscribeManager->Subscribe(msg + kSubHeaderSize, sock))
 	{
-		size_t dirLength = strlen(msg + SUB_HEADER_SIZE) + NULL_VALUE_SIZE;
+		size_t dirLength = strlen(msg + kSubHeaderSize) + kNullValueSize;
 
 		// copy protocol type
 		msg[kProtocolHeaderIndex] = kSubscribe;
@@ -31,10 +31,10 @@ void SubscribeProcessor::ProcessPacket(SOCKET sock, char *msg)
 
 		int len = 0 + kSuccessSubscribeHeaderSize;
 
-		memcpy(msg + len + sizeof(int), msg + SUB_HEADER_SIZE, dirLength);
+		memcpy(msg + len + sizeof(int), msg + kSubHeaderSize, dirLength);
 		len += dirLength;
 
-		memcpy(msg + PROTOCOL_TYPE_SIZE + kSuccessSubscribeIndexSize, &dirLength, sizeof(int));
+		memcpy(msg + kProtocolTypeSize + kSuccessSubscribeIndexSize, &dirLength, sizeof(int));
 		len += sizeof(int);
 
 		publishManager->Publish(msg, sock, len);
