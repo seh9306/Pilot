@@ -31,6 +31,7 @@ void ShowProcessor::ProcessPacket(SOCKET sock, char *msg)
 	if (files == nullptr)
 	{
 		// send fail
+		delete files;
 		return;
 	}
 	
@@ -86,5 +87,7 @@ void ShowProcessor::ProcessPacket(SOCKET sock, char *msg)
 
 		publishManager->Publish(msg, sock, writeOffset);
 	}
+
+	delete files;
 }
 
