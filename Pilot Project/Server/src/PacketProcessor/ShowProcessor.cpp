@@ -28,20 +28,26 @@ void ShowProcessor::ProcessPacket(SOCKET sock, char *msg)
 
 	std::list<WIN32_FIND_DATA>* files = fileManager->GetFileList(msg + readOffset);
 
-	if (files == nullptr)
-	{
-		// send fail
-		delete files;
-		return;
-	}
-	
 	uint32_t showNumber = -1;
 
 	readOffset = kProtocolTypeSize;
 	ReadMessage(&showNumber, msg, sizeof(showNumber), readOffset);
 
-	uint32_t listSize = files->size();
 	int writeOffset = kProtocolTypeSize;
+
+	if (files == nullptr)
+	{
+		uint32_t listSize = 0;
+
+		WriteLengthWithAddingSize(msg, &listSize, sizeof(listSize), writeOffset);
+
+		// kShow
+		publishManager->Publish(msg, sock, writeOffset);
+
+		return;
+	}
+
+	uint32_t listSize = files->size();
 
 	WriteLengthWithAddingSize(msg, &listSize, sizeof(listSize), writeOffset);
 

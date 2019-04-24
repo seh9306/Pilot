@@ -9,19 +9,17 @@ void Receiver::operator()(HANDLE pComPort, std::vector<std::unique_ptr<PacketPro
 {
 	SocketDataPerClient* socketDataPerClient;
 	AsyncIOBuffer* asyncIOBuffer = nullptr;
-
 	DWORD bytesTransferred = 0;
-	DWORD flags = 0; // (?)
+	DWORD flags = 0; // (?) 
 	while (true) 
 	{
-		int errorCode = GetQueuedCompletionStatus(pComPort,
+		GetQueuedCompletionStatus(pComPort,
 			&bytesTransferred,
 			(PULONG_PTR)&socketDataPerClient,
 			(LPOVERLAPPED*)&asyncIOBuffer,
 			INFINITE
 		);
 
-		printf("::%d, %d\n", WSAGetLastError(), errorCode);
 		if (bytesTransferred == 0)
 		{
 			// @issue make socket INVALID_SOCKET
@@ -30,8 +28,9 @@ void Receiver::operator()(HANDLE pComPort, std::vector<std::unique_ptr<PacketPro
 			{
 				fileAgentSocket->CloseSocket();
 			}
-			//closesocket(perHandleData->hClntSock);
-			//delete socketDataPerClient;
+			closesocket(socketDataPerClient->clientSocket);
+			socketDataPerClient->clientSocket = INVALID_SOCKET;
+			delete socketDataPerClient;
 			delete asyncIOBuffer;
 			continue;
 		}

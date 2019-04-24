@@ -242,6 +242,8 @@
     <Image Include="res\directory.ico" />
     <Image Include="res\FileAgent.ico" />
     <Image Include="res\FileAgentDoc.ico" />
+    <Image Include="res\hardDriver.ico" />
+    <Image Include="res\icon3.ico" />
     <Image Include="res\paper.ico" />
     <Image Include="res\Toolbar.bmp" />
   </ItemGroup>

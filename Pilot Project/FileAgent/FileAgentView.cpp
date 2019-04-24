@@ -36,7 +36,8 @@ BEGIN_MESSAGE_MAP(CFileAgentView, CView)
 	ON_NOTIFY(LVN_KEYDOWN, FILECLISTCTRL_ID, &CFileAgentView::OnListKeyDown)
 	ON_NOTIFY(LVN_ENDLABELEDIT, FILECLISTCTRL_ID, &CFileAgentView::OnEndLabelEdit)
 	ON_NOTIFY(LVN_BEGINDRAG, FILECLISTCTRL_ID, &CFileAgentView::OnBeginDrag)
-	ON_NOTIFY(TVN_SELCHANGED, FILECTREECTRL_ID, &CFileAgentView::OnBeginDrag)
+	ON_NOTIFY(TVN_SELCHANGING, FILECTREECTRL_ID, &CFileAgentView::OnTvnSelChangingTree)
+	ON_NOTIFY(NM_DBLCLK, FILECTREECTRL_ID, &CFileAgentView::OnTreeItemDblclked)
 	ON_WM_CREATE()
 	ON_WM_MOUSEMOVE()
 	ON_WM_LBUTTONUP()
@@ -235,7 +236,7 @@ void CFileAgentView::SetItemCountEx(int count)
 
 void CFileAgentView::AddDrives(wchar_t* pLogicalDriveStrings, int type)
 {
-	fileCTreeCtrl.InsertItem(pLogicalDriveStrings, 0, 0, TVI_ROOT);
+	HTREEITEM hItem = fileCTreeCtrl.InsertItem(pLogicalDriveStrings, 2, 2, TVI_ROOT);
 }
 
 // CFileAgentView 메시지 처리기
@@ -244,25 +245,20 @@ int CFileAgentView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CView::OnCreate(lpCreateStruct) == -1)
 		return -1;
 	
-	fileCListCtrl.Create( WS_VISIBLE | WS_BORDER | LVS_OWNERDATA | LVS_REPORT | LVS_EDITLABELS | LVS_ICON, CRect(180, 30, 180, 180), this, FILECLISTCTRL_ID);
-	fileCTreeCtrl.Create(WS_VISIBLE | WS_BORDER, CRect(0, 30, 180, 180), this, FILECTREECTRL_ID);
+	fileCListCtrl.Create(WS_VISIBLE | WS_BORDER | LVS_OWNERDATA | LVS_REPORT | LVS_EDITLABELS | LVS_ICON, CRect(180, 30, 180, 180), this, FILECLISTCTRL_ID);
+	fileCTreeCtrl.Create(WS_VISIBLE | WS_BORDER | TVS_SHOWSELALWAYS | TVS_HASLINES, CRect(0, 30, 180, 180), this, FILECTREECTRL_ID);
 	
-	imgList.Create(16, 16, ILC_COLOR32, 2, 0);
+	/*long style = GetWindowLong(fileCTreeCtrl, GWL_STYLE) | TVS_HASBUTTONS | TVS_HASLINES | TVS_SHOWSELALWAYS | TVS_LINESATROOT | TVS_TRACKSELECT;
+
+	SetWindowLong(fileCTreeCtrl, GWL_STYLE, style);*/
+
+	imgList.Create(16, 16, ILC_COLOR32, 3, 0);
+	
 	imgList.Add(AfxGetApp()->LoadIconW(IDI_ICON1));
 	imgList.Add(AfxGetApp()->LoadIconW(IDI_ICON2));
+	imgList.Add(AfxGetApp()->LoadIconW(IDI_ICON3));
 	fileCListCtrl.SetImageList(&imgList, LVSIL_SMALL);
 	fileCTreeCtrl.SetImageList(&imgList, LVSIL_NORMAL);
-
-	// @temp 
-	/*HTREEITEM hItem = nullptr;
-	hItem = fileCTreeCtrl.InsertItem(TEXT("바탕 화면"), 0, 0, TVI_ROOT);
-	hItem = fileCTreeCtrl.InsertItem(TEXT("내 문서"), 0, 5, hItem);
-	fileCTreeCtrl.InsertItem(TEXT("내 그림"), 2, 5, hItem);
-	fileCTreeCtrl.InsertItem(TEXT("내 비디오"), 3, 5, hItem);
-	hItem = fileCTreeCtrl.InsertItem(TEXT("Sample folder"), 4, 5, hItem);
-	hItem = fileCTreeCtrl.InsertItem(TEXT("Sub folder"), 4, 5, hItem);
-	
-	fileCTreeCtrl.EnsureVisible(hItem);*/
 
 	// setting column name
 	stringTableValue.LoadStringW(FILE_CLIENT_COLUMN_NAME);
@@ -406,6 +402,83 @@ void CFileAgentView::OnItemDblclked(NMHDR * pNMHDR, LRESULT * pResult)
 	}
 }
 
+int CFileAgentView::CountTreeItems(HTREEITEM hItem = NULL, BOOL Recurse = TRUE)
+{
+	int Count = 0;
+	if (hItem == NULL)
+		hItem = fileCTreeCtrl.GetSelectedItem();
+	if (fileCTreeCtrl.ItemHasChildren(hItem))
+	{
+		hItem = fileCTreeCtrl.GetNextItem(hItem, TVGN_CHILD);
+		while (hItem)
+		{
+			Count++;
+			if (Recurse)
+				Count += CountTreeItems(hItem, Recurse);
+			hItem = fileCTreeCtrl.GetNextItem(hItem, TVGN_NEXT);
+		}
+	}
+	return Count;
+}
+
+#include <thread>
+// List item dbclick handler
+void CFileAgentView::OnTreeItemDblclked(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	HTREEITEM hItem = fileCTreeCtrl.GetSelectedItem();
+	bool connecting = true;
+
+	std::thread([&] {
+		while (true)
+		{
+			if (fileCListCtrl.GetItemCount() > 0)
+			{
+				break;
+			}
+			if (listSize == 0)
+			{
+				break;
+			}
+			Sleep(10);
+		}
+
+		connecting = false;
+	}).detach();
+	
+	while (connecting)
+	{
+		MSG msg = { 0, };
+		while (connecting && GetMessage(&msg, nullptr, 0, 0))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+		Sleep(10);
+	}
+
+	int childNumber = CountTreeItems(hItem, false);
+	
+	if (childNumber == 0)
+	{
+		int size = files.size();
+		
+		for (auto file : files)
+		{
+			if ((file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+				&& file.cFileName != CString("..")
+				&& file.cFileName != CString("."))
+			{
+				fileCTreeCtrl.InsertItem(file.cFileName, 0, 0, hItem);
+			}
+		}
+	}
+	else
+	{
+		fileCTreeCtrl.Expand(hItem, TVE_COLLAPSERESET | TVE_COLLAPSE);
+	}
+
+}
+
 // #delete file
 void CFileAgentView::DeleteFileRequest()
 {
@@ -471,10 +544,47 @@ void CFileAgentView::OnBeginDrag(NMHDR * pNMHDR, LRESULT * pResult)
 	SetCapture();
 
 }
-
-void CFileAgentView::OnTvnSelChangedTree(NMHDR* pNMHDR, LRESULT* pResult)
+#include <iostream>
+void CFileAgentView::OnTvnSelChangingTree(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LPNMTREEVIEW pNMTreeView = reinterpret_cast<LPNMTREEVIEW>(pNMHDR);
+	HTREEITEM hItem = pNMTreeView->itemNew.hItem;
+	dir = fileCTreeCtrl.GetItemText(hItem);
+	int nImage = -1;
+	int selectedImage = -1;
+	fileCTreeCtrl.GetItemImage(hItem, nImage, selectedImage);
+
+	FileAgentSocket *fileAgentSocket = FileAgentSocket::GetInstance();
+	fileAgentSocket->UnSubscribe(pCharDir);
+	SetItemCountEx(0);
+	files.clear();
+	CString parent;
+	while (hItem != nullptr)
+	{
+		hItem = fileCTreeCtrl.GetParentItem(hItem);
+		parent = fileCTreeCtrl.GetItemText(hItem);
+
+		if (parent.Compare(CString("")) == 0)
+		{
+			break;
+		}
+
+		if (parent.GetAt(parent.GetLength()) == '\\')
+		{
+			parent.Append(dir);
+		}
+		else
+		{
+			parent.Append('\\' + dir);
+		}
+
+		dir = parent;
+	}
+
+	dirCEdit.SetWindowText(dir);
+	strcpy_s(pCharDir, CT2A(dir));
+	fileAgentSocket->Subscribe(pCharDir);
+
 }
 
 int CFileAgentView::GetHitIndex(CPoint point)

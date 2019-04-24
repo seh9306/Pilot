@@ -51,10 +51,13 @@ public:
 	afx_msg void OnConeectBtnClicked();
 	afx_msg void OnExploreBtnClicked();
 	afx_msg void OnItemDblclked(NMHDR* pNMHDR, LRESULT* pResult);
+	int CountTreeItems(HTREEITEM hItem, BOOL Recurse);
+	void DelTreeItems(HTREEITEM hItem);
+	void OnTreeItemDblclked(NMHDR * pNMHDR, LRESULT * pResult);
 	void DeleteFileRequest();
 	void RenameFileRequest();
 	afx_msg void OnBeginDrag(NMHDR* pNMHDR, LRESULT* pResult);
-	afx_msg	void OnTvnSelChangedTree(NMHDR * pNMHDR, LRESULT * pResult);
+	afx_msg void OnTvnSelChangingTree(NMHDR * pNMHDR, LRESULT * pResult);
 	int GetHitIndex(CPoint point);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
@@ -93,7 +96,7 @@ private:
 	int         nOldTarget = -1;   
 	int         nSource = -1;      
 
-	int listSize = 0;
+	int listSize = -1;
 	DWORD showNumber = 0;
 	
 	int nameColumnPos = 0;
